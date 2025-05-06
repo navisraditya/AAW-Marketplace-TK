@@ -1,0 +1,173 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: backend-aaw
+data:
+  TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
+  ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
+  DB_HOST: "database-products.database-aaw.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "products"
+  PRODUCT_MS_URL: "http://products.products.svc.cluster.local:30002/api"
+  AUTH_URL: "http://authentication.backend-aaw.svc.cluster.local:30000/api"
+  TENANT_URL: "http://tenants.backend-aaw.svc.cluster.local:30003/api"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+  namespace: backend-aaw
+type: Opaque
+data:
+  JWT_SECRET: "YXV0aF9tc19qd3Rfc2VjcmV0"
+  ADMIN_JWT_SECRET: "YWRtaW5fYXV0aF9tc2p3dF9zZWNyZXQ="
+  DB_USER: "cG9zdGdyZXM="
+  DB_PASSWORD: "cG9zdGdyZXM="
+  POSTGRES_PASSWORD: "cG9zdGdyZXM="
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products
+  namespace: backend-aaw
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: products
+  template:
+    metadata:
+      labels:
+        app: products
+    spec:
+      containers:
+      - name: products
+        image: products:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8882
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secrets
+        volumeMounts: []
+      volumes: []
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: products
+  namespace: backend-aaw
+spec:
+  type: NodePort
+  selector:
+    app: products
+  ports:
+  - protocol: TCP
+    port:  30002
+    targetPort: 8882
+    nodePort: 30002
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-products
+  namespace: database-aaw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database-products
+  template:
+    metadata:
+      labels:
+        app: database-products
+    spec:
+      containers:
+      - name: database-products
+        image: postgres:latest
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_NAME
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DB_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DB_PASSWORD
+
+        ports:
+        - containerPort: 5432
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: products-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: products-storage
+        persistentVolumeClaim:
+          claimName: products-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database-products
+  namespace: database-aaw
+spec:
+  type: ClusterIP
+  selector:
+    app: database-products
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: products-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: /mnt/data/products
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: products-pvc
+  namespace: database-aaw
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ""

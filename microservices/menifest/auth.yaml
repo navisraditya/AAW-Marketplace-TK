@@ -1,0 +1,205 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: backend-aaw
+data:
+  TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
+  ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
+  DB_HOST: "database-auth.database-aaw.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "authentication"
+  PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+  namespace: backend-aaw
+type: Opaque
+data:
+  JWT_SECRET: "YXV0aF9tc19qd3Rfc2VjcmV0"
+  ADMIN_JWT_SECRET: "YWRtaW5fYXV0aF9tc2p3dF9zZWNyZXQ="
+  DB_USER: "cG9zdGdyZXM="
+  DB_PASSWORD: "cG9zdGdyZXM="
+  POSTGRES_PASSWORD: "cG9zdGdyZXM="
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication
+  namespace: backend-aaw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentication
+  template:
+    metadata:
+      labels:
+        app: authentication
+    spec:
+      containers:
+      - name: authentication
+        image: authentication:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8880
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secrets
+        volumeMounts:
+        - name: auth-storage
+          mountPath: /app/data
+        resources:
+          requests:
+            cpu: "100m"  # 0.1 core
+            memory: "256Mi"
+          limits:
+            cpu: "200m"  # 0.2 core
+            memory: "512Mi"
+           
+      volumes:
+      - name: auth-storage
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentication
+  namespace: backend-aaw
+spec:
+  type: NodePort
+  selector:
+    app: authentication
+  ports:
+  - protocol: TCP
+    port: 30000
+    targetPort: 8880
+    nodePort: 30000
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-auth
+  namespace: database-aaw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database-auth
+  template:
+    metadata:
+      labels:
+        app: database-auth
+    spec:
+      containers:
+      - name: database-auth
+        image: postgres:latest
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_NAME
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DB_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DB_PASSWORD
+
+        ports:
+        - containerPort: 5432
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database-auth
+  namespace: database-aaw
+spec:
+  type: ClusterIP
+  selector:
+    app: database-auth
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: authentication-pv
+  namespace: backend-aaw
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: /mnt/data/authentication
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authentication-pvc
+  namespace: database-aaw
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ""
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: authentication-hpa
+  namespace: backend-aaw
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: authentication
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 75
