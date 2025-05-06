@@ -21,6 +21,7 @@
     "express-prom-bundle": "^7.0.0",
     "pg": "^8.11.3",
     "prom-client": "^15.1.2",
+    "tenant-microservice": "file:",
     "zod": "^3.22.4"
   },
   "devDependencies": {

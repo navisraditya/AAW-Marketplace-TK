@@ -18,6 +18,7 @@
 		"drizzle-orm": "^0.30.2",
 		"express": "^4.18.3",
 		"express-prom-bundle": "^7.0.0",
+		"orders-microservice": "file:",
 		"pg": "^8.11.3",
 		"prom-client": "^15.1.2",
 		"uuid": "^9.0.1",
