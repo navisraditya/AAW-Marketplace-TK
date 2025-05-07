@@ -22,3 +22,13 @@ export const validate = (schema: z.Schema) => {
     }
   };
 };
+
+export const paginationMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
+
+    req.query.page = page.toString();
+    req.query.limit = limit.toString();
+
+    next();
+};

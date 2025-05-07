@@ -3,11 +3,12 @@ import { validate } from '@src/middleware/validate';
 import * as Validation from './validation';
 import * as Handler from './product.handler';
 import { verifyJWT } from '@src/middleware/verifyJWT';
+import { paginationMiddleware } from '@src/middleware/validate';
 
 const router = express.Router();
 
-router.get('', Handler.getAllProductsHandler);
-router.get('/category', Handler.getAllCategoryHandler);
+router.get('', paginationMiddleware, Handler.getAllProductsHandler);
+router.get('/category', paginationMiddleware, Handler.getAllCategoryHandler);
 router.get('/:id', validate(Validation.getProductByIdSchema), Handler.getProductByIdHandler);
 router.post('/many', validate(Validation.getManyProductDatasByIdSchema), Handler.getManyProductDatasByIdHandler);
 router.get('/category/:category_id', validate(Validation.getProductByCategorySchema), Handler.getProductByCategoryHandler);
