@@ -46,8 +46,8 @@ spec:
     spec:
       containers:
       - name: tenants
-        image: tenants:latest
-        imagePullPolicy: Never
+        image: gnh374/tenants:latest
+        
         ports:
         - containerPort: 8003
         envFrom:

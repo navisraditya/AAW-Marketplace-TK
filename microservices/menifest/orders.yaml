@@ -44,8 +44,7 @@ spec:
     spec:
       containers:
       - name: orders
-        image: orders:latest
-        imagePullPolicy: Never
+        image: gnh374/orders:latest
         ports:
         - containerPort: 8001
         envFrom:

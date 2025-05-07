@@ -44,8 +44,7 @@ spec:
     spec:
       containers:
       - name: authentication
-        image: authentication:latest
-        imagePullPolicy: Never
+        image: gnh374/authentication:latest
         ports:
         - containerPort: 8000
         envFrom:

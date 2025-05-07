@@ -44,8 +44,7 @@ spec:
     spec:
       containers:
       - name: wishlists
-        image: wishlists:latest
-        imagePullPolicy: Never
+        image: gnh374/wishlists:latest
         ports:
         - containerPort: 8004
         envFrom:
