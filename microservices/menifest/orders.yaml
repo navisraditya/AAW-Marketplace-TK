@@ -47,7 +47,7 @@ spec:
         image: orders:latest
         imagePullPolicy: Never
         ports:
-        - containerPort: 8881
+        - containerPort: 8001
         envFrom:
         - configMapRef:
             name: app-config
@@ -80,7 +80,7 @@ spec:
   ports:
   - protocol: TCP
     port:  30001
-    targetPort: 8881
+    targetPort: 8001
     nodePort: 30001
 
 ---

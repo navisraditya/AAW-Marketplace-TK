@@ -47,7 +47,7 @@ spec:
         image: wishlists:latest
         imagePullPolicy: Never
         ports:
-        - containerPort: 8884
+        - containerPort: 8004
         envFrom:
         - configMapRef:
             name: app-config
@@ -74,7 +74,7 @@ spec:
   ports:
   - protocol: TCP
     port:  30004
-    targetPort: 8884
+    targetPort: 8004
     nodePort: 30004
 
 ---
