@@ -17,6 +17,9 @@ importers:
       axios-retry:
         specifier: ^4.5.0
         version: 4.5.0(axios@1.9.0)
+      '@redis/json':
+        specifier: ^5.0.1
+        version: 5.0.1(@redis/client@5.0.1)
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -28,25 +31,44 @@ importers:
         version: 16.5.0
       drizzle-orm:
         specifier: ^0.29.4
+<<<<<<< HEAD
         version: 0.29.5(@opentelemetry/api@1.9.0)(@types/pg@8.12.0)(pg@8.15.6)
+=======
+        version: 0.29.5(@opentelemetry/api@1.9.0)(@types/pg@8.15.0)(pg@8.15.6)
+>>>>>>> dhafin
       express:
         specifier: ^4.18.3
         version: 4.21.2
       express-prom-bundle:
         specifier: ^7.0.0
         version: 7.0.2(prom-client@15.1.3)
+<<<<<<< HEAD
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
       opossum:
         specifier: ^8.4.0
         version: 8.4.0
+=======
+      ioredis:
+        specifier: ^5.6.1
+        version: 5.6.1
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.2
+>>>>>>> dhafin
       pg:
         specifier: ^8.11.3
         version: 8.15.6
       prom-client:
         specifier: ^15.1.2
         version: 15.1.3
+<<<<<<< HEAD
+=======
+      redis:
+        specifier: ^5.0.1
+        version: 5.0.1
+>>>>>>> dhafin
       zod:
         specifier: ^3.22.4
         version: 3.24.4
@@ -65,6 +87,7 @@ importers:
         version: 9.0.9
       '@types/node':
         specifier: ^20.11.24
+<<<<<<< HEAD
         version: 20.17.41
       '@types/opossum':
         specifier: ^8.1.8
@@ -72,6 +95,15 @@ importers:
       '@types/pg':
         specifier: ^8.11.2
         version: 8.12.0
+=======
+        version: 20.17.44
+      '@types/pg':
+        specifier: ^8.11.2
+        version: 8.15.0
+      '@types/redis':
+        specifier: ^4.0.11
+        version: 4.0.11
+>>>>>>> dhafin
       drizzle-kit:
         specifier: ^0.20.14
         version: 0.20.18
@@ -80,7 +112,11 @@ importers:
         version: 3.1.10
       ts-node:
         specifier: ^10.9.2
+<<<<<<< HEAD
         version: 10.9.2(@types/node@20.17.41)(typescript@5.8.3)
+=======
+        version: 10.9.2(@types/node@20.17.44)(typescript@5.8.3)
+>>>>>>> dhafin
       tsc-alias:
         specifier: ^1.8.8
         version: 1.8.16
@@ -540,6 +576,12 @@ packages:
       hono: '>=3.9.0'
       zod: ^3.19.1
 
+<<<<<<< HEAD
+=======
+  '@ioredis/commands@1.2.0':
+    resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
+
+>>>>>>> dhafin
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
     engines: {node: '>=6.0.0'}
@@ -570,9 +612,43 @@ packages:
     resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
     engines: {node: '>=8.0.0'}
 
+<<<<<<< HEAD
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
 
+=======
+  '@redis/bloom@5.0.1':
+    resolution: {integrity: sha512-F7L+rnuJvq/upKaVoEgsf8VT7g5pLQYWRqSUOV3uO4vpVtARzSKJ7CLyJjVsQS+wZVCGxsLMh8DwAIDcny1B+g==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@redis/client': ^5.0.1
+
+  '@redis/client@5.0.1':
+    resolution: {integrity: sha512-k0EJvlMGEyBqUD3orKe0UMZ66fPtfwqPIr+ZSd853sXj2EyhNtPXSx+J6sENXJNgAlEBhvD+57Dwt0qTisKB0A==}
+    engines: {node: '>= 18'}
+
+  '@redis/json@5.0.1':
+    resolution: {integrity: sha512-t94HOTk5myfhvaHZzlUzk2hoUvH2jsjftcnMgJWuHL/pzjAJQoZDCUJzjkoXIUjWXuyJixTguaaDyOZWwqH2Kg==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@redis/client': ^5.0.1
+
+  '@redis/search@5.0.1':
+    resolution: {integrity: sha512-wipK6ZptY7K68B7YLVhP5I/wYCDUU+mDJMyJiUcQLuOs7/eKOBc8lTXKUSssor8QnzZSPy4A5ulcC5PZY22Zgw==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@redis/client': ^5.0.1
+
+  '@redis/time-series@5.0.1':
+    resolution: {integrity: sha512-k6PgbrakhnohsEWEAdQZYt3e5vSKoIzpKvgQt8//lnWLrTZx+c3ed2sj0+pKIF4FvnSeuXLo4bBWcH0Z7Urg1A==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@redis/client': ^5.0.1
+
+  '@tsconfig/node10@1.0.11':
+    resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
+
+>>>>>>> dhafin
   '@tsconfig/node12@1.0.11':
     resolution: {integrity: sha512-cqefuRsh12pWyGsIoBKJA9luFu3mRxCA+ORZvA4ktLSzIuCUtWVxGIuXigEwO5/ywWFMZ2QEGKWvkZG1zDMTag==}
 
@@ -612,6 +688,7 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
+<<<<<<< HEAD
   '@types/node@20.17.41':
     resolution: {integrity: sha512-bOB0a6u/e7Ey/Gyc+ghRg+xoXFGYug4I7pdvwxudh+Ewmk93Z4wTudn4NIKiIRYQyujf9jm2uTBzQK8tg8oUeQ==}
 
@@ -627,6 +704,24 @@ packages:
   '@types/range-parser@1.2.7':
     resolution: {integrity: sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==}
 
+=======
+  '@types/node@20.17.44':
+    resolution: {integrity: sha512-50sE4Ibb4BgUMxHrcJQSAU0Fu7fLcTdwcXwRzEF7wnVMWvImFLg2Rxc7SW0vpvaJm4wvhoWEZaQiPpBpocZiUA==}
+
+  '@types/pg@8.15.0':
+    resolution: {integrity: sha512-JFxVIO0hZCbQXQGbRBQjbRWNCG3CujfEUBD4Ny2l0QqDyE0vqAPiMSyx0AIszMS0KdLZxz2GxZUUF3FBUXhOXA==}
+
+  '@types/qs@6.9.18':
+    resolution: {integrity: sha512-kK7dgTYDyGqS+e2Q4aK9X3D7q234CIZ1Bv0q/7Z5IwRDoADNU81xXJK/YVyLbLTZCoIwUoDoffFeF+p/eIklAA==}
+
+  '@types/range-parser@1.2.7':
+    resolution: {integrity: sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==}
+
+  '@types/redis@4.0.11':
+    resolution: {integrity: sha512-bI+gth8La8Wg/QCR1+V1fhrL9+LZUSWfcqpOj2Kc80ZQ4ffbdL173vQd5wovmoV9i071FU9oP2g6etLuEwb6Rg==}
+    deprecated: This is a stub types definition. redis provides its own type definitions, so you do not need this installed.
+
+>>>>>>> dhafin
   '@types/send@0.17.4':
     resolution: {integrity: sha512-x2EM6TJOybec7c52BX0ZspPodMsQUd5L6PRwOunVyVUhXiBSKf3AezDL8Dgvgt5o0UfKNfuA0eMLr2wLT4AiBA==}
 
@@ -679,6 +774,7 @@ packages:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
 
+<<<<<<< HEAD
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
@@ -693,6 +789,8 @@ packages:
   axios@1.9.0:
     resolution: {integrity: sha512-re4CqKTJaURpzbLHtIi6XpDv20/CnpXOtjRY5/CU32L8gU8ek9UIivcfvSWvmKEngmVbrUtPpdDwWDWL7DNHvg==}
 
+=======
+>>>>>>> dhafin
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
@@ -759,14 +857,24 @@ packages:
     resolution: {integrity: sha512-zlnpg0jNcibNrO7GG9IeHH7maWFeCz+Ja1wx/7tZNU5ASSSSZ+/qZciM0/LHCYxSdqv5h2sdbQ/PXYdOuetXvA==}
     engines: {node: '>=0.10'}
 
+<<<<<<< HEAD
+=======
+  cluster-key-slot@1.1.2:
+    resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
+    engines: {node: '>=0.10.0'}
+
+>>>>>>> dhafin
   color-support@1.1.3:
     resolution: {integrity: sha512-qiBjkpbMLO/HL68y+lh4q0/O1MZFj2RX6X/KmMa3+gJD3z+WwI1ZzDHysvqHGS3mP6mznPckpXmw1nI9cJjyRg==}
     hasBin: true
 
+<<<<<<< HEAD
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
 
+=======
+>>>>>>> dhafin
   commander@9.5.0:
     resolution: {integrity: sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==}
     engines: {node: ^12.20.0 || >=14}
@@ -824,6 +932,7 @@ packages:
       supports-color:
         optional: true
 
+<<<<<<< HEAD
   delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
@@ -831,6 +940,15 @@ packages:
   delegates@1.0.0:
     resolution: {integrity: sha512-bd2L678uiWATM6m5Z1VzNCErI3jiGzt6HGY8OVICs40JQq/HALfbyNJmp0UDakEY4pMMaN0Ly5om/B1VI/+xfQ==}
 
+=======
+  delegates@1.0.0:
+    resolution: {integrity: sha512-bd2L678uiWATM6m5Z1VzNCErI3jiGzt6HGY8OVICs40JQq/HALfbyNJmp0UDakEY4pMMaN0Ly5om/B1VI/+xfQ==}
+
+  denque@2.1.0:
+    resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==}
+    engines: {node: '>=0.10'}
+
+>>>>>>> dhafin
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
@@ -974,10 +1092,13 @@ packages:
     resolution: {integrity: sha512-FGgH2h8zKNim9ljj7dankFPcICIK9Cp5bm+c2gQSYePhpaG5+esrLODihIorn+Pe6FGJzWhXQotPv73jTaldXA==}
     engines: {node: '>= 0.4'}
 
+<<<<<<< HEAD
   es-set-tostringtag@2.1.0:
     resolution: {integrity: sha512-j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==}
     engines: {node: '>= 0.4'}
 
+=======
+>>>>>>> dhafin
   es5-ext@0.10.64:
     resolution: {integrity: sha512-p2snDhiLaXe6dahss1LddxqEm+SkuDvV8dnIQG0MWjyHpcMNfXKPE+/Cc0y+PhxJX3A4xGNeFCj5oc0BUh6deg==}
     engines: {node: '>=0.10'}
@@ -1054,6 +1175,7 @@ packages:
     resolution: {integrity: sha512-6BN9trH7bp3qvnrRyzsBz+g3lZxTNZTbVO2EV1CS0WIcDbawYVdYvGflME/9QP0h0pYlCDBCTjYa9nZzMDpyxQ==}
     engines: {node: '>= 0.8'}
 
+<<<<<<< HEAD
   follow-redirects@1.15.9:
     resolution: {integrity: sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==}
     engines: {node: '>=4.0'}
@@ -1067,6 +1189,8 @@ packages:
     resolution: {integrity: sha512-hGfm/slu0ZabnNt4oaRZ6uREyfCj6P4fT/n6A1rGV+Z0VdGXjfOhVUpkn6qVQONHGIFwmveGXyDs75+nr6FM8w==}
     engines: {node: '>= 6'}
 
+=======
+>>>>>>> dhafin
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
     engines: {node: '>= 0.6'}
@@ -1138,10 +1262,13 @@ packages:
     resolution: {integrity: sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ==}
     engines: {node: '>= 0.4'}
 
+<<<<<<< HEAD
   has-tostringtag@1.0.2:
     resolution: {integrity: sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==}
     engines: {node: '>= 0.4'}
 
+=======
+>>>>>>> dhafin
   has-unicode@2.0.1:
     resolution: {integrity: sha512-8Rf9Y83NBReMnx0gFzA8JImQACstCYWUplepDa9xprwwtmgEZUF0h/i5xSA625zB/I37EtrswSST6OXxwaaIJQ==}
 
@@ -1182,6 +1309,13 @@ packages:
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
+<<<<<<< HEAD
+=======
+  ioredis@5.6.1:
+    resolution: {integrity: sha512-UxC0Yv1Y4WRJiGQxQkP0hfdL0/5/6YvdfOOClRgJ0qppSarkhneSa6UvkMkms0AkdGimSH3Ikqm+6mkMmX7vGA==}
+    engines: {node: '>=12.22.0'}
+
+>>>>>>> dhafin
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
@@ -1209,10 +1343,13 @@ packages:
   is-promise@2.2.2:
     resolution: {integrity: sha512-+lP4/6lKUBfQjZ2pdxThZvLUAafmZb8OAxFb8XXtiQmS35INgr85hdOGoEs124ez1FCnZJt6jau/T+alh58QFQ==}
 
+<<<<<<< HEAD
   is-retry-allowed@2.2.0:
     resolution: {integrity: sha512-XVm7LOeLpTW4jV19QSH38vkswxoLud8sQ57YwJVTPWdiaI9I8keEhGFpBlslyVsgdQy4Opg8QOLb8YRgsyZiQg==}
     engines: {node: '>=10'}
 
+=======
+>>>>>>> dhafin
   is-what@4.1.16:
     resolution: {integrity: sha512-ZhMwEosbFJkA0YhFnNDgTM4ZxDRsS6HqTo7qsZM08fehyRYIYa0yHu5R6mgo1n/8MgaPBXiPimPD77baVFYg+A==}
     engines: {node: '>=12.13'}
@@ -1230,15 +1367,32 @@ packages:
     resolution: {integrity: sha512-PRp66vJ865SSqOlgqS8hujT5U4AOgMfhrwYIuIhfKaoSCZcirrmASQr8CX7cUg+RMih+hgznrjp99o+W4pJLHQ==}
     engines: {node: '>=12', npm: '>=6'}
 
+<<<<<<< HEAD
   jwa@1.4.1:
     resolution: {integrity: sha512-qiLX/xhEEFKUAJ6FiBMbes3w9ATzyk5W7Hvzpa/SLYdxNtng+gcurvrI7TbACjIXlsJyr05/S1oUhZrc63evQA==}
+=======
+  jwa@1.4.2:
+    resolution: {integrity: sha512-eeH5JO+21J78qMvTIDdBXidBd6nG2kZjg5Ohz/1fpa28Z4CcsWUzJ1ZZyFq/3z3N17aZy+ZuBoHljASbL1WfOw==}
+>>>>>>> dhafin
 
   jws@3.2.2:
     resolution: {integrity: sha512-YHlZCB6lMTllWDtSPHz/ZXTsi8S00usEV6v1tjq8tOUZzw7DpSDWVXjXDre6ed1w/pd495ODpHZYSdkRTsa0HA==}
 
+<<<<<<< HEAD
   lodash.includes@4.3.0:
     resolution: {integrity: sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w==}
 
+=======
+  lodash.defaults@4.2.0:
+    resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
+
+  lodash.includes@4.3.0:
+    resolution: {integrity: sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w==}
+
+  lodash.isarguments@3.1.0:
+    resolution: {integrity: sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg==}
+
+>>>>>>> dhafin
   lodash.isboolean@3.0.3:
     resolution: {integrity: sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg==}
 
@@ -1406,10 +1560,13 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
+<<<<<<< HEAD
   opossum@8.4.0:
     resolution: {integrity: sha512-YYamqKu48bZCSTJKSWLLO4SSk8tKN2Gg2z1sJZVzHJYVObMO/xQpIzAh6re9HCMHRdB1dJvBjJH18DW7xYOicg==}
     engines: {node: ^22 || ^21 || ^20 || ^18 || ^16}
 
+=======
+>>>>>>> dhafin
   parseurl@1.3.3:
     resolution: {integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==}
     engines: {node: '>= 0.8'}
@@ -1518,9 +1675,12 @@ packages:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
 
+<<<<<<< HEAD
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
 
+=======
+>>>>>>> dhafin
   pstree.remy@1.1.8:
     resolution: {integrity: sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w==}
 
@@ -1551,6 +1711,21 @@ packages:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
     engines: {node: '>=8.10.0'}
 
+<<<<<<< HEAD
+=======
+  redis-errors@1.2.0:
+    resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
+    engines: {node: '>=4'}
+
+  redis-parser@3.0.0:
+    resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
+    engines: {node: '>=4'}
+
+  redis@5.0.1:
+    resolution: {integrity: sha512-J8nqUjrfSq0E8NQkcHDZ4HdEQk5RMYjP3jZq02PE+ERiRxolbDNxPaTT4xh6tdrme+lJ86Goje9yMt9uzh23hQ==}
+    engines: {node: '>= 18'}
+
+>>>>>>> dhafin
   resolve-pkg-maps@1.0.0:
     resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
 
@@ -1636,6 +1811,12 @@ packages:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
 
+<<<<<<< HEAD
+=======
+  standard-as-callback@2.1.0:
+    resolution: {integrity: sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A==}
+
+>>>>>>> dhafin
   statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
@@ -2021,6 +2202,11 @@ snapshots:
       hono: 4.7.8
       zod: 3.24.4
 
+<<<<<<< HEAD
+=======
+  '@ioredis/commands@1.2.0': {}
+
+>>>>>>> dhafin
   '@jridgewell/resolve-uri@3.1.2': {}
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
@@ -2059,6 +2245,29 @@ snapshots:
 
   '@opentelemetry/api@1.9.0': {}
 
+<<<<<<< HEAD
+=======
+  '@redis/bloom@5.0.1(@redis/client@5.0.1)':
+    dependencies:
+      '@redis/client': 5.0.1
+
+  '@redis/client@5.0.1':
+    dependencies:
+      cluster-key-slot: 1.1.2
+
+  '@redis/json@5.0.1(@redis/client@5.0.1)':
+    dependencies:
+      '@redis/client': 5.0.1
+
+  '@redis/search@5.0.1(@redis/client@5.0.1)':
+    dependencies:
+      '@redis/client': 5.0.1
+
+  '@redis/time-series@5.0.1(@redis/client@5.0.1)':
+    dependencies:
+      '@redis/client': 5.0.1
+
+>>>>>>> dhafin
   '@tsconfig/node10@1.0.11': {}
 
   '@tsconfig/node12@1.0.11': {}
@@ -2069,11 +2278,16 @@ snapshots:
 
   '@types/bcrypt@5.0.2':
     dependencies:
+<<<<<<< HEAD
       '@types/node': 20.17.41
+=======
+      '@types/node': 20.17.44
+>>>>>>> dhafin
 
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
+<<<<<<< HEAD
       '@types/node': 20.17.41
 
   '@types/connect@3.4.38':
@@ -2087,6 +2301,21 @@ snapshots:
   '@types/express-serve-static-core@4.19.6':
     dependencies:
       '@types/node': 20.17.41
+=======
+      '@types/node': 20.17.44
+
+  '@types/connect@3.4.38':
+    dependencies:
+      '@types/node': 20.17.44
+
+  '@types/cors@2.8.17':
+    dependencies:
+      '@types/node': 20.17.44
+
+  '@types/express-serve-static-core@4.19.6':
+    dependencies:
+      '@types/node': 20.17.44
+>>>>>>> dhafin
       '@types/qs': 6.9.18
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -2103,12 +2332,17 @@ snapshots:
   '@types/jsonwebtoken@9.0.9':
     dependencies:
       '@types/ms': 2.1.0
+<<<<<<< HEAD
       '@types/node': 20.17.41
+=======
+      '@types/node': 20.17.44
+>>>>>>> dhafin
 
   '@types/mime@1.3.5': {}
 
   '@types/ms@2.1.0': {}
 
+<<<<<<< HEAD
   '@types/node@20.17.41':
     dependencies:
       undici-types: 6.19.8
@@ -2120,6 +2354,15 @@ snapshots:
   '@types/pg@8.12.0':
     dependencies:
       '@types/node': 20.17.41
+=======
+  '@types/node@20.17.44':
+    dependencies:
+      undici-types: 6.19.8
+
+  '@types/pg@8.15.0':
+    dependencies:
+      '@types/node': 20.17.44
+>>>>>>> dhafin
       pg-protocol: 1.9.5
       pg-types: 4.0.2
 
@@ -2127,15 +2370,30 @@ snapshots:
 
   '@types/range-parser@1.2.7': {}
 
+<<<<<<< HEAD
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
       '@types/node': 20.17.41
+=======
+  '@types/redis@4.0.11':
+    dependencies:
+      redis: 5.0.1
+
+  '@types/send@0.17.4':
+    dependencies:
+      '@types/mime': 1.3.5
+      '@types/node': 20.17.44
+>>>>>>> dhafin
 
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
+<<<<<<< HEAD
       '@types/node': 20.17.41
+=======
+      '@types/node': 20.17.44
+>>>>>>> dhafin
       '@types/send': 0.17.4
 
   abbrev@1.1.1: {}
@@ -2177,6 +2435,7 @@ snapshots:
 
   array-union@2.1.0: {}
 
+<<<<<<< HEAD
   asynckit@0.4.0: {}
 
   auth-microservice@file:(@opentelemetry/api@1.9.0)(@types/pg@8.12.0):
@@ -2234,6 +2493,8 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
+=======
+>>>>>>> dhafin
   balanced-match@1.0.2: {}
 
   bcrypt@5.1.1:
@@ -2320,11 +2581,17 @@ snapshots:
       memoizee: 0.4.17
       timers-ext: 0.1.8
 
+<<<<<<< HEAD
   color-support@1.1.3: {}
 
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
+=======
+  cluster-key-slot@1.1.2: {}
+
+  color-support@1.1.3: {}
+>>>>>>> dhafin
 
   commander@9.5.0: {}
 
@@ -2368,10 +2635,17 @@ snapshots:
     optionalDependencies:
       supports-color: 5.5.0
 
+<<<<<<< HEAD
   delayed-stream@1.0.0: {}
 
   delegates@1.0.0: {}
 
+=======
+  delegates@1.0.0: {}
+
+  denque@2.1.0: {}
+
+>>>>>>> dhafin
   depd@2.0.0: {}
 
   destroy@1.2.0: {}
@@ -2416,10 +2690,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+<<<<<<< HEAD
   drizzle-orm@0.29.5(@opentelemetry/api@1.9.0)(@types/pg@8.12.0)(pg@8.15.6):
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/pg': 8.12.0
+=======
+  drizzle-orm@0.29.5(@opentelemetry/api@1.9.0)(@types/pg@8.15.0)(pg@8.15.6):
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.0
+      '@types/pg': 8.15.0
+>>>>>>> dhafin
       pg: 8.15.6
 
   dunder-proto@1.0.1:
@@ -2450,6 +2731,7 @@ snapshots:
     dependencies:
       es-errors: 1.3.0
 
+<<<<<<< HEAD
   es-set-tostringtag@2.1.0:
     dependencies:
       es-errors: 1.3.0
@@ -2457,6 +2739,8 @@ snapshots:
       has-tostringtag: 1.0.2
       hasown: 2.0.2
 
+=======
+>>>>>>> dhafin
   es5-ext@0.10.64:
     dependencies:
       es6-iterator: 2.0.3
@@ -2662,6 +2946,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+<<<<<<< HEAD
   follow-redirects@1.15.9: {}
 
   form-data@4.0.2:
@@ -2675,6 +2960,12 @@ snapshots:
 
   fresh@0.5.2: {}
 
+=======
+  forwarded@0.2.0: {}
+
+  fresh@0.5.2: {}
+
+>>>>>>> dhafin
   fs-minipass@2.1.0:
     dependencies:
       minipass: 3.3.6
@@ -2760,10 +3051,13 @@ snapshots:
   has-flag@3.0.0: {}
 
   has-symbols@1.1.0: {}
+<<<<<<< HEAD
 
   has-tostringtag@1.0.2:
     dependencies:
       has-symbols: 1.1.0
+=======
+>>>>>>> dhafin
 
   has-unicode@2.0.1: {}
 
@@ -2805,6 +3099,7 @@ snapshots:
 
   inherits@2.0.4: {}
 
+<<<<<<< HEAD
   ipaddr.js@1.9.1: {}
 
   is-binary-path@2.1.0:
@@ -2815,6 +3110,32 @@ snapshots:
 
   is-fullwidth-code-point@3.0.0: {}
 
+=======
+  ioredis@5.6.1:
+    dependencies:
+      '@ioredis/commands': 1.2.0
+      cluster-key-slot: 1.1.2
+      debug: 4.4.0(supports-color@5.5.0)
+      denque: 2.1.0
+      lodash.defaults: 4.2.0
+      lodash.isarguments: 3.1.0
+      redis-errors: 1.2.0
+      redis-parser: 3.0.0
+      standard-as-callback: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+
+  ipaddr.js@1.9.1: {}
+
+  is-binary-path@2.1.0:
+    dependencies:
+      binary-extensions: 2.3.0
+
+  is-extglob@2.1.1: {}
+
+  is-fullwidth-code-point@3.0.0: {}
+
+>>>>>>> dhafin
   is-glob@4.0.3:
     dependencies:
       is-extglob: 2.1.1
@@ -2823,10 +3144,15 @@ snapshots:
 
   is-promise@2.2.2: {}
 
+<<<<<<< HEAD
   is-retry-allowed@2.2.0: {}
 
   is-what@4.1.16: {}
 
+=======
+  is-what@4.1.16: {}
+
+>>>>>>> dhafin
   json-diff@0.9.0:
     dependencies:
       cli-color: 2.0.4
@@ -2848,7 +3174,11 @@ snapshots:
       ms: 2.1.3
       semver: 7.7.1
 
+<<<<<<< HEAD
   jwa@1.4.1:
+=======
+  jwa@1.4.2:
+>>>>>>> dhafin
     dependencies:
       buffer-equal-constant-time: 1.0.1
       ecdsa-sig-formatter: 1.0.11
@@ -2856,9 +3186,10 @@ snapshots:
 
   jws@3.2.2:
     dependencies:
-      jwa: 1.4.1
+      jwa: 1.4.2
       safe-buffer: 5.2.1
 
+<<<<<<< HEAD
   lodash.includes@4.3.0: {}
 
   lodash.isboolean@3.0.3: {}
@@ -2875,6 +3206,28 @@ snapshots:
 
   lodash.throttle@4.1.1: {}
 
+=======
+  lodash.defaults@4.2.0: {}
+
+  lodash.includes@4.3.0: {}
+
+  lodash.isarguments@3.1.0: {}
+
+  lodash.isboolean@3.0.3: {}
+
+  lodash.isinteger@4.0.4: {}
+
+  lodash.isnumber@3.0.3: {}
+
+  lodash.isplainobject@4.0.6: {}
+
+  lodash.isstring@4.0.1: {}
+
+  lodash.once@4.1.1: {}
+
+  lodash.throttle@4.1.1: {}
+
+>>>>>>> dhafin
   lru-queue@0.1.0:
     dependencies:
       es5-ext: 0.10.64
@@ -3002,6 +3355,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
+<<<<<<< HEAD
   opossum@8.4.0: {}
 
   parseurl@1.3.3: {}
@@ -3012,6 +3366,16 @@ snapshots:
 
   path-type@4.0.0: {}
 
+=======
+  parseurl@1.3.3: {}
+
+  path-is-absolute@1.0.1: {}
+
+  path-to-regexp@0.1.12: {}
+
+  path-type@4.0.0: {}
+
+>>>>>>> dhafin
   pg-cloudflare@1.2.5:
     optional: true
 
@@ -3097,10 +3461,15 @@ snapshots:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
 
+<<<<<<< HEAD
   proxy-from-env@1.1.0: {}
 
   pstree.remy@1.1.8: {}
 
+=======
+  pstree.remy@1.1.8: {}
+
+>>>>>>> dhafin
   qs@6.13.0:
     dependencies:
       side-channel: 1.1.0
@@ -3128,10 +3497,31 @@ snapshots:
     dependencies:
       picomatch: 2.3.1
 
+<<<<<<< HEAD
   resolve-pkg-maps@1.0.0: {}
 
   reusify@1.1.0: {}
 
+=======
+  redis-errors@1.2.0: {}
+
+  redis-parser@3.0.0:
+    dependencies:
+      redis-errors: 1.2.0
+
+  redis@5.0.1:
+    dependencies:
+      '@redis/bloom': 5.0.1(@redis/client@5.0.1)
+      '@redis/client': 5.0.1
+      '@redis/json': 5.0.1(@redis/client@5.0.1)
+      '@redis/search': 5.0.1(@redis/client@5.0.1)
+      '@redis/time-series': 5.0.1(@redis/client@5.0.1)
+
+  resolve-pkg-maps@1.0.0: {}
+
+  reusify@1.1.0: {}
+
+>>>>>>> dhafin
   rimraf@3.0.2:
     dependencies:
       glob: 7.2.3
@@ -3226,8 +3616,15 @@ snapshots:
 
   split2@4.2.0: {}
 
+<<<<<<< HEAD
   statuses@2.0.1: {}
 
+=======
+  standard-as-callback@2.1.0: {}
+
+  statuses@2.0.1: {}
+
+>>>>>>> dhafin
   string-width@4.2.3:
     dependencies:
       emoji-regex: 8.0.0
@@ -3280,14 +3677,22 @@ snapshots:
 
   tr46@0.0.3: {}
 
+<<<<<<< HEAD
   ts-node@10.9.2(@types/node@20.17.41)(typescript@5.8.3):
+=======
+  ts-node@10.9.2(@types/node@20.17.44)(typescript@5.8.3):
+>>>>>>> dhafin
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
+<<<<<<< HEAD
       '@types/node': 20.17.41
+=======
+      '@types/node': 20.17.44
+>>>>>>> dhafin
       acorn: 8.14.1
       acorn-walk: 8.3.4
       arg: 4.1.3

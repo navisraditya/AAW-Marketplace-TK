@@ -11,10 +11,12 @@
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
     "paths": {
       "@src/*": ["./src/*"],
-      "@db/*": ["./db/*"]
+      "@db/*": ["./db/*"],
+      "@type/*": ["./type/*"],
     }
   },
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   }
 }
+

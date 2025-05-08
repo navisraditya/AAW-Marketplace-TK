@@ -1,19 +1,24 @@
 version: '3.8'
-
 services:
   # Node.js application service
-  microservice:
+  auth-service:
     build: .
     ports:
       - "8000:8000"
     environment:
       - TENANT_ID=47dd6b24-0b23-46b0-a662-776158d089ba
+      - ADMIN_TENANT_ID=47dd6b24-0b23-46b0-a662-776158d089ba
       - JWT_SECRET=auth_ms_jwt_secret
+      - ADMIN_JWT_SECRET=auth_ms_jwt_secret
       - DB_HOST=db
       - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - db
-
+      - redis  # Added dependency on redis service
+    networks:
+      - auth-network
+      
   # PostgreSQL database service
   db:
     image: postgres:latest
@@ -23,3 +28,24 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
+    networks:
+      - auth-network  # Added network for db
+    
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]  # Disabled protected mode
+    networks:
+      - auth-network  # Added network for redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  
+networks:
+  auth-network:
+    name: shared-microservices-network
+    driver: bridge  # Added driver specification
+    external: false  # This will create the network if it doesn't exist

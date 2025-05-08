@@ -1,18 +1,22 @@
 version: '3.8'
-
 services:
   # Node.js application service
-  microservice:
+  tenant-service:
     build: .
     environment:
-      - AUTH_MS_URL=http://host.docker.internal:7999
+      - AUTH_MS_URL=http://auth-service:8000  # Added the missing service name
       - DB_HOST=db
       - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379
     ports:
       - "8003:8003"
     depends_on:
       - db
-
+      - redis  # Added dependency on redis service
+    networks:
+      - tenant-network
+      - auth-network
+      
   # PostgreSQL database service
   db:
     image: postgres:latest
@@ -22,3 +26,25 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5431:5432"
+    networks:
+      - tenant-network  # Added network for db
+    
+  redis:
+    image: redis:alpine
+    ports:
+      - "6380:6379"
+    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]  # Disabled protected mode
+    networks:
+      - tenant-network  # Added network for redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  
+networks:
+  tenant-network:
+    driver: bridge
+  auth-network:
+    name: shared-microservices-network
+    external: true

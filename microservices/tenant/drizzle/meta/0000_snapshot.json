@@ -1,5 +1,5 @@
 {
-  "id": "557315c3-f52d-4a8f-815d-c4b1e31e7ed0",
+  "id": "5b101734-e2ed-4b49-bf0f-e7ae4068ae12",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -40,8 +40,8 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
