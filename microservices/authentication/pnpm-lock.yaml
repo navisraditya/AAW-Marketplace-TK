@@ -66,6 +66,9 @@ importers:
       '@types/node':
         specifier: ^20.11.24
         version: 20.17.41
+      '@types/opossum':
+        specifier: ^8.1.8
+        version: 8.1.8
       '@types/pg':
         specifier: ^8.11.2
         version: 8.12.0
@@ -611,6 +614,9 @@ packages:
 
   '@types/node@20.17.41':
     resolution: {integrity: sha512-bOB0a6u/e7Ey/Gyc+ghRg+xoXFGYug4I7pdvwxudh+Ewmk93Z4wTudn4NIKiIRYQyujf9jm2uTBzQK8tg8oUeQ==}
+
+  '@types/opossum@8.1.8':
+    resolution: {integrity: sha512-FTpWfHcpMgdLIdaTpL1D/nTlIH03T62RIQfzmwdEDAndYJwHDdUTkBvgXhaVp/zN74woiWEyb6DSNuZHPt1gmA==}
 
   '@types/pg@8.12.0':
     resolution: {integrity: sha512-a9Z11ecnpNPFu2iT4Qo9SSYgM2r1l4UqLIQ454zhCDRzxqOh/vsi57FFovbc64oBGPBotXw5cRhUQtJEHCb/OA==}
@@ -2107,6 +2113,10 @@ snapshots:
     dependencies:
       undici-types: 6.19.8
 
+  '@types/opossum@8.1.8':
+    dependencies:
+      '@types/node': 20.17.41
+
   '@types/pg@8.12.0':
     dependencies:
       '@types/node': 20.17.41
@@ -2171,6 +2181,8 @@ snapshots:
 
   auth-microservice@file:(@opentelemetry/api@1.9.0)(@types/pg@8.12.0):
     dependencies:
+      axios: 1.9.0
+      axios-retry: 4.5.0(axios@1.9.0)
       bcrypt: 5.1.1
       cors: 2.8.5
       dotenv: 16.5.0
@@ -2178,6 +2190,7 @@ snapshots:
       express: 4.21.2
       express-prom-bundle: 7.0.2(prom-client@15.1.3)
       jsonwebtoken: 9.0.2
+      opossum: 8.4.0
       pg: 8.15.6
       prom-client: 15.1.3
       zod: 3.24.4
@@ -2195,6 +2208,7 @@ snapshots:
       - '@vercel/postgres'
       - better-sqlite3
       - bun-types
+      - debug
       - encoding
       - expo-sqlite
       - knex

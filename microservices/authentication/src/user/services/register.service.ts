@@ -18,7 +18,7 @@ export const registerService = async (
         if (!process.env.TENANT_ID) {
             return new InternalServerErrorResponse("Server tenant ID is missing").generate();
         }
-    
+         console.log(hashedPassword)
         const userData: NewUser = {
             tenant_id: process.env.TENANT_ID,
             username,
