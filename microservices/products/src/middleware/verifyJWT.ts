@@ -8,15 +8,19 @@ export const verifyJWT = async (
 ) => {
   try {
     const token = req.headers.authorization?.split("Bearer ")[1];
+
+    console.log("checking token...");
     if (!token) {
       return res.status(401).send({ message: "Invalid token" });
     }
 
+    console.log("authenticating admin token...");
     const payload = await axios.post(`${process.env.AUTH_MS_URL}/user/verify-admin-token`, { token });
     if (payload.status !== 200) {
       return res.status(401).send({ message: "Invalid token" });
     }
 
+    console.log("authenticating tenant id...");
     const SERVER_TENANT_ID = process.env.TENANT_ID;
     if (!SERVER_TENANT_ID) {
       return res.status(500).send({ message: "Server Tenant ID not found" });
@@ -30,6 +34,7 @@ export const verifyJWT = async (
       return res.status(500).send({ message: "Server Tenant not found" });
     }
 
+    console.log("checking tenant ownership...");
     // Check for tenant ownership
     if (payload.data.user.id !== tenantPayload.data.tenants.owner_id) {
       return res.status(401).send({ message: "Invalid token" });

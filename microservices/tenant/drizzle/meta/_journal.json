@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1709828124854,
-      "tag": "0000_furry_russian",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1712744288262,
-      "tag": "0001_wet_mulholland_black",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1712744409152,
-      "tag": "0002_zippy_sue_storm",
+      "when": 1746676502291,
+      "tag": "0000_youthful_sleepwalker",
       "breakpoints": true
     }
   ]
