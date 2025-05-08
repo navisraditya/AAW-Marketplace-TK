@@ -36,7 +36,7 @@ export const getTenantById = async (tenant_id: string) => {
         try {
             await redisService.set(cacheKey, tenant, 3600);
         } catch (error) {
-            console.error(`Redis error when setting user: ${tenant}`, error);
+            console.error(`Redis error when setting order: ${tenant}`, error);
         }
     }
 

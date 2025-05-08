@@ -6,7 +6,8 @@
 	"scripts": {
 		"start": "node dist/server.js",
 		"dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
-		"build": "tsc && tsc-alias"
+		"build": "tsc && tsc-alias",
+        "generate": "drizzle-kit generate:pg"
 	},
 	"keywords": [],
 	"author": "Vincent Suryakim",
@@ -36,5 +37,11 @@
 		"tsconfig-paths": "^4.2.0",
 		"tsx": "^4.7.1",
 		"typescript": "^5.3.3"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"es5-ext",
+			"esbuild"
+		]
 	}
 }
