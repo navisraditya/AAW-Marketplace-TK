@@ -188,7 +188,7 @@ spec:
     kind: Deployment
     name: authentication
   minReplicas: 2
-  maxReplicas: 5
+  maxReplicas: 6
   metrics:
     - type: Resource
       resource:
