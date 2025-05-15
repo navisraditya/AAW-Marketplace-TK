@@ -16,7 +16,7 @@ spec:
       containers:
       - name: redis
         image: redis:latest
-        command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no"]
+        command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--tcp-keepalive", "60"]
         ports:
         - containerPort: 6379
         resources:
@@ -26,6 +26,18 @@ spec:
           limits:
             cpu: "200m"
             memory: "256Mi"
+        livenessProbe:
+          tcpSocket:
+            port: 6379
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service

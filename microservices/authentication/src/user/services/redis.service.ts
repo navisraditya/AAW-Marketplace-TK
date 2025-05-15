@@ -95,4 +95,3 @@ class RedisService {
 }
 
 export default RedisService.getInstance();
-
