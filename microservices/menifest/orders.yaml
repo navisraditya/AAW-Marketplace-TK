@@ -37,9 +37,9 @@ metadata:
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
   ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
-  DB_HOST: "database-auth.database-aaw.svc.cluster.local"
+  DB_HOST: "database-orders.database-aaw.svc.cluster.local"
   DB_PORT: "5432"
-  DB_NAME: "authentication"
+  DB_NAME: "orders"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
   REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
 
