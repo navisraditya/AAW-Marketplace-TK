@@ -7,6 +7,8 @@ import { paginationMiddleware } from '@src/middleware/validate';
 
 const router = express.Router();
 
+router.get('/seed-seed', Handler.seedProduct);
+
 router.get('', paginationMiddleware, Handler.getAllProductsHandler);
 router.get('/category', paginationMiddleware, Handler.getAllCategoryHandler);
 router.get('/:id', validate(Validation.getProductByIdSchema), Handler.getProductByIdHandler);
@@ -18,5 +20,6 @@ router.put('/:id', verifyJWT, validate(Validation.editProductSchema), Handler.ed
 router.put('/category/:category_id', verifyJWT, validate(Validation.editCategorySchema), Handler.editCategoryHandler);
 router.delete('/:id', verifyJWT, validate(Validation.deleteProductSchema), Handler.deleteProductHandler);
 router.delete('/category/:category_id', verifyJWT, validate(Validation.deleteCategorySchema), Handler.deleteCategoryHandler);
+
 
 export default router;

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as Service from './services';
+import { seedCategoryAndProducts } from "@src/seed";
 
 export const getAllProductsHandler = async (req: Request, res: Response) => {
     const { page = 1, limit = 10 } = req.query;
@@ -66,4 +67,13 @@ export const deleteCategoryHandler = async (req: Request, res: Response) => {
     const { category_id } = req.params;
     const response = await Service.deleteCategoryService(category_id);
     return res.status(response.status).send(response.data);
+}
+
+export const seedProduct = async(req: Request, res: Response) => {
+    try {
+        seedCategoryAndProducts();
+        res.status(200).json({message: "seeding berhasil"});
+    } catch (err) {
+        res.status(309).json({message: "gagal seeding, silahkan coba lagi"});
+    }
 }

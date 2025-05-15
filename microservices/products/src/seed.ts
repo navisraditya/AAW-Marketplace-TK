@@ -3,7 +3,7 @@ import { db } from '@src/db/index';
 import { categories, NewCategory } from '@db/schema/categories';
 import { products, NewProduct } from '@db/schema/products';
 
-async function seedCategoryAndProducts() {
+export async function seedCategoryAndProducts() {
   const TENANT_ID   = '47dd6b24-0b23-46b0-a662-776158d089ba';
   const CATEGORY_ID = '3de4fe08-f501-49e3-9a29-72ab6170f09d';
   const SPECIAL_ID  = 'fa6f5f96-327a-435b-85a0-3f72804f426b';
@@ -57,11 +57,3 @@ async function seedCategoryAndProducts() {
 
   console.log('🎉 All products seeded!');
 }
-
-seedCategoryAndProducts()
-  .then(() => process.exit(0))
-  .catch((e) => {
-    console.error('❌ Seeder failed', e);
-    process.exit(1);
-  });
-
