@@ -12,7 +12,7 @@ data:
   DB_NAME: "wishlists"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
   REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
-
+  AUTH_MS_URL: "http://products.backend-aaw.svc.cluster.local:30000"
 ---
 apiVersion: v1
 kind: Secret

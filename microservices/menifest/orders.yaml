@@ -10,8 +10,9 @@ data:
   DB_HOST: "database-orders.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "orders"
-  PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
+  PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002"
   REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
+  AUTH_MS_URL: "http://products.backend-aaw.svc.cluster.local:30000"
 
 ---
 apiVersion: v1

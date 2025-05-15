@@ -10,9 +10,8 @@ data:
   DB_HOST: "database-products.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "products"
-  PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
-  AUTH_URL: "http://authentication.backend-aaw.svc.cluster.local:30000/api"
-  TENANT_URL: "http://tenants.backend-aaw.svc.cluster.local:30003/api"
+  AUTH__MS_URL: "http://authentication.backend-aaw.svc.cluster.local:30000"
+  TENANT_MS_URL: "http://tenants.backend-aaw.svc.cluster.local:30003"
   REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
 
 ---
