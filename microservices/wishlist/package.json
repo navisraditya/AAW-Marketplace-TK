@@ -22,6 +22,7 @@
 		"opossum": "^8.4.0",
 		"pg": "^8.11.3",
 		"prom-client": "^15.1.2",
+		"redis": "^5.0.1",
 		"wishlist-microservice": "file:",
 		"zod": "^3.22.4"
 	},
