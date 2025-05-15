@@ -7,7 +7,7 @@ metadata:
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
   ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
-  DB_HOST: "database-products.database-aaw.svc.cluster.local"
+  DB_HOST: "database-products.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "products"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
@@ -34,13 +34,13 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: app-config-db
-  namespace: database-aaw
+  namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
   ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
-  DB_HOST: "database-auth.database-aaw.svc.cluster.local"
+  DB_HOST: "database-products.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
-  DB_NAME: "authentication"
+  DB_NAME: "products"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
   REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
 
@@ -49,7 +49,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: app-secrets-db
-  namespace: database-aaw
+  namespace: backend-aaw
 type: Opaque
 data:
   JWT_SECRET: "YXV0aF9tc19qd3Rfc2VjcmV0"
@@ -64,7 +64,7 @@ metadata:
   name: products
   namespace: backend-aaw
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: products
@@ -83,9 +83,9 @@ spec:
             name: app-config
         - secretRef:
             name: app-secrets
-        env:
-        - name: REDIS_URL
-          value: "redis.backend-aaw.svc.cluster.local:6379"
+        volumeMounts:
+        - name: products-storage
+          mountPath: /data
         resources:
           requests:
             cpu: "200m"  # 0.1 core
@@ -93,8 +93,10 @@ spec:
           limits:
             cpu: "200m"  # 0.2 core
             memory: "512Mi"
-        volumeMounts: []
-      volumes: []
+           
+      volumes:
+      - name: products-storage
+        emptyDir: {}
 
 ---
 apiVersion: v1
@@ -108,16 +110,17 @@ spec:
     app: products
   ports:
   - protocol: TCP
-    port:  30002
+    port: 30002
     targetPort: 8002
     nodePort: 30002
+
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: database-products
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   replicas: 1
   selector:
@@ -135,17 +138,17 @@ spec:
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: app-config-db
+              name: app-config
               key: DB_NAME
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: app-secrets-db
+              name: app-secrets
               key: DB_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: app-secrets-db
+              name: app-secrets
               key: DB_PASSWORD
 
         ports:
@@ -159,10 +162,20 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
         volumeMounts:
-        - name: products-storage
+        - name: postgres-data
           mountPath: /var/lib/postgresql/data
+          subPath: postgres
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
       volumes:
-      - name: products-storage
+      - name: postgres-data
         persistentVolumeClaim:
           claimName: products-pvc
 
@@ -171,7 +184,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: database-products
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   type: ClusterIP
   selector:
@@ -186,9 +199,10 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: products-pv
+  namespace: backend-aaw
 spec:
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
@@ -201,20 +215,20 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: products-pvc
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
   storageClassName: ""
 
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: orders-hpa
+  name: products-hpa
   namespace: backend-aaw
 spec:
   scaleTargetRef:
@@ -222,7 +236,7 @@ spec:
     kind: Deployment
     name: products
   minReplicas: 2
-  maxReplicas: 5
+  maxReplicas: 6
   metrics:
     - type: Resource
       resource:

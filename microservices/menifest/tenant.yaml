@@ -7,7 +7,7 @@ metadata:
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
   ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
-  DB_HOST: "database-tenants.database-aaw.svc.cluster.local"
+  DB_HOST: "database-tenants.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "tenants"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
@@ -34,13 +34,13 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: app-config-db
-  namespace: database-aaw
+  namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
   ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
-  DB_HOST: "database-auth.database-aaw.svc.cluster.local"
+  DB_HOST: "database-tenants.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
-  DB_NAME: "authentication"
+  DB_NAME: "tenants"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
   REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
 
@@ -49,7 +49,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: app-secrets-db
-  namespace: database-aaw
+  namespace: backend-aaw
 type: Opaque
 data:
   JWT_SECRET: "YXV0aF9tc19qd3Rfc2VjcmV0"
@@ -76,18 +76,16 @@ spec:
       containers:
       - name: tenants
         image: gnh374/tenants:latest
-        
         ports:
         - containerPort: 8003
         envFrom:
         - configMapRef:
-            name: app-config-db
+            name: app-config
         - secretRef:
-            name: app-secrets-db
-        env:
-        - name: REDIS_URL
-          value: "redis.backend-aaw.svc.cluster.local:6379"
-
+            name: app-secrets
+        volumeMounts:
+        - name: tenants-storage
+          mountPath: /data
         resources:
           requests:
             cpu: "200m"  # 0.1 core
@@ -95,6 +93,10 @@ spec:
           limits:
             cpu: "200m"  # 0.2 core
             memory: "512Mi"
+           
+      volumes:
+      - name: tenants-storage
+        emptyDir: {}
 
 ---
 apiVersion: v1
@@ -117,7 +119,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: database-tenants
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   replicas: 1
   selector:
@@ -158,6 +160,23 @@ spec:
             - postgres
           initialDelaySeconds: 5
           periodSeconds: 5
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+          subPath: postgres
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: tenants-pvc
 
       volumes:
       - name: tenants-storage
@@ -169,7 +188,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: database-tenants
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   type: ClusterIP
   selector:
@@ -184,9 +203,10 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: tenants-pv
+  namespace: backend-aaw
 spec:
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
@@ -199,13 +219,13 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: tenants-pvc
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
   storageClassName: ""
 
 
@@ -213,7 +233,7 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: orders-hpa
+  name: tenants-hpa
   namespace: backend-aaw
 spec:
   scaleTargetRef:
@@ -221,7 +241,7 @@ spec:
     kind: Deployment
     name: tenants
   minReplicas: 2
-  maxReplicas: 5
+  maxReplicas: 6
   metrics:
     - type: Resource
       resource:
