@@ -40,14 +40,3 @@ export async function seedAll() {
   await db.insert(orderTable).values(orders).execute();
   console.log(`✅ Seeded ${ORDER_COUNT} orders`);
 }
-
-seedAll()
-  .then(() => {
-    console.log('🎉 All seeding complete!');
-    process.exit(0);
-  })
-  .catch((err) => {
-    console.error('❌ Seeding failed', err);
-    process.exit(1);
-  });
-
