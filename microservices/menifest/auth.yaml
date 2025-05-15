@@ -7,7 +7,7 @@ metadata:
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
   ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
-  DB_HOST: "database-auth.database-aaw.svc.cluster.local"
+  DB_HOST: "database-auth.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "authentication"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
@@ -32,11 +32,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: app-config-db
-  namespace: database-aaw
+  namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
   ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
-  DB_HOST: "database-auth.database-aaw.svc.cluster.local"
+  DB_HOST: "database-auth.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "authentication"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
@@ -47,7 +47,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: app-secrets-db
-  namespace: database-aaw
+  namespace: backend-aaw
 type: Opaque
 data:
   JWT_SECRET: "YXV0aF9tc19qd3Rfc2VjcmV0"
@@ -118,7 +118,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: database-auth
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   replicas: 1
   selector:
@@ -182,7 +182,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: database-auth
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   type: ClusterIP
   selector:
@@ -197,7 +197,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: authentication-pv
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   capacity:
     storage: 1Gi
@@ -213,7 +213,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: authentication-pvc
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   accessModes:
     - ReadWriteOnce
