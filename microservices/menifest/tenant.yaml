@@ -13,6 +13,7 @@ data:
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
   AUTH_URL: "http://authentication.backend-aaw.svc.cluster.local:30000/api"
   TENANT_URL: "http://tenants.tenants.svc.cluster.local:30003/api"
+  REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
 
 ---
 apiVersion: v1

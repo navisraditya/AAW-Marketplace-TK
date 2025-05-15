@@ -11,6 +11,7 @@ data:
   DB_PORT: "5432"
   DB_NAME: "wishlists"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
+  REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
 
 ---
 apiVersion: v1
