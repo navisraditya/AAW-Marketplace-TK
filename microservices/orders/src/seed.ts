@@ -11,7 +11,7 @@ const CART_COUNT          = 32;
 const ORDER_COUNT         = 256;
 const SHIPPING_PROVIDERS  = ['JNE','TIKI','SICEPAT','GOSEND','GRAB_EXPRESS'] as const;
 
-async function seedAll() {
+export async function seedAll() {
   // 1) clear both tables
   await db.execute(sql`
     TRUNCATE TABLE "cart", "order"

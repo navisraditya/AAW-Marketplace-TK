@@ -5,13 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-<<<<<<< Updated upstream
-      "when": 1747338011745,
-      "tag": "0000_pink_golden_guardian",
-=======
       "when": 1747334520752,
       "tag": "0000_keen_excalibur",
->>>>>>> Stashed changes
       "breakpoints": true
     }
   ]

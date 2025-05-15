@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as Service from "./services";
+import { seedAll } from "@src/seed";
 
 export const getAllOrdersHandler = async (req: Request, res: Response) => {
     const { user } = req.body;
@@ -33,4 +34,13 @@ export const cancelOrderHandler = async (req: Request, res: Response) => {
     const { user } = req.body;
     const response = await Service.cancelOrderService(user, orderId);
     return res.status(response.status).send(response.data);
+}
+
+export const seedOrder = async (req: Request, res: Response) => {
+    try {
+        await seedAll();
+        res.status(200).json({message: 'berhasil'});
+    } catch (err) {
+        res.status(309).json({message: 'gagal seeding ya'});
+    }
 }
