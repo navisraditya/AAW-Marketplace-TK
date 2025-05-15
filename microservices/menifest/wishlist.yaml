@@ -52,6 +52,9 @@ spec:
             name: app-config
         - secretRef:
             name: app-secrets
+        env:
+        - name: REDIS_URL
+          value: "redis.backend-aaw.svc.cluster.local:6379"
         resources:
           requests:
             cpu: "200m"  # 0.1 core
