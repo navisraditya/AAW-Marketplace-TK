@@ -178,11 +178,6 @@ spec:
         persistentVolumeClaim:
           claimName: tenants-pvc
 
-      volumes:
-      - name: tenants-storage
-        persistentVolumeClaim:
-          claimName: tenants-pvc
-
 ---
 apiVersion: v1
 kind: Service
