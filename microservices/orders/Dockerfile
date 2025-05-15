@@ -2,7 +2,7 @@
 FROM node:18.18.2 AS builder
 
 # Setting up the work directory
-WORKDIR /service-auth
+WORKDIR /service-orders
 
 # Copying package.json separately
 COPY package.json ./
@@ -17,32 +17,27 @@ RUN pnpm install
 COPY . .
 
 # Building our application
-RUN pnpm config set enable-scripts true
-RUN pnpm run generate
 RUN pnpm run build
 
 # Stage 2: Creating a lightweight image for production
 FROM node:18.18.2-slim
 
 # Declaring env
-ENV PORT 8000
+ENV PORT 8001
 ENV NODE_ENV production
 
 # Set working directory
-WORKDIR /service-auth
+WORKDIR /service-orders
 
-RUN npm install -g tsx
 # Copy built files from the previous stage
-COPY --from=builder /service-auth/dist ./dist
-COPY --from=builder /service-auth/package.json ./package.json
-COPY --from=builder /service-auth/drizzle ./drizzle
-
+COPY --from=builder /service-orders/dist ./dist
+COPY --from=builder /service-orders/package.json ./package.json
 
 # Install production dependencies only
 RUN npm install --only=production
 
 # Expose server port
-EXPOSE 8000
+EXPOSE 8001
 
 # Start the application
-CMD ["bash", "-c", "tsx dist/src/db/migrate.js && node dist/src/server.js"]
+CMD ["node", "dist/src/server.js"]
