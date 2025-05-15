@@ -16,6 +16,7 @@ spec:
       containers:
       - name: redis
         image: redis:latest
+        command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no"]
         ports:
         - containerPort: 6379
         resources:
