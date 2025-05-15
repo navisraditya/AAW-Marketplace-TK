@@ -7,7 +7,9 @@
 		"start": "node dist/server.js",
 		"dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
 		"build": "tsc && tsc-alias",
-		"generate": "drizzle-kit generate:pg"
+        "migrate": "tsx src/db/migrate.ts",
+		"generate": "drizzle-kit generate:pg",
+        "seed": "ts-node src/seed.ts"
 	},
 	"keywords": [],
 	"author": "Vincent Suryakim",

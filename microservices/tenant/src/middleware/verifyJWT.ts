@@ -21,7 +21,7 @@ const circuitBreakerOptions = {
 };
 
 const verifyTokenBreaker = new CircuitBreaker(async (token: string) => {
-  const response = await axios.post(`${process.env.AUTH_MS_URL}/user/verify-token`, { token });
+  const response = await axios.post(`${process.env.AUTH_MS_URL}/user/verify-admin-token`, { token });
   if (response.status !== 200) {
     throw new Error("Invalid token");
   }
