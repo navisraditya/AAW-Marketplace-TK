@@ -7,7 +7,7 @@
 		"start": "node dist/server.js",
 		"dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
 		"build": "tsc && tsc-alias",
-        "generate": "drizzle-kit generate:pg"
+		"generate": "drizzle-kit generate:pg"
 	},
 	"keywords": [],
 	"author": "Vincent Suryakim",
@@ -20,6 +20,7 @@
 		"drizzle-orm": "^0.30.2",
 		"express": "^4.18.3",
 		"express-prom-bundle": "^7.0.0",
+		"jsonwebtoken": "^9.0.2",
 		"opossum": "^8.4.0",
 		"pg": "^8.11.3",
 		"prom-client": "^15.1.2",
