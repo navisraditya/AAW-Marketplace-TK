@@ -1,0 +1,28 @@
+### Get All Orders
+GET http://localhost:8001/orders
+Authorization: Bearer api
+
+### Get Order Detail
+GET http://localhost:8001/orders/<orderId>
+Authorization: Bearer api
+
+### Place Order
+POST http://localhost:8001/order
+Authorization: Bearer api
+Content-Type: application/json
+
+{
+  "orderDetails": {
+    "productId": "123",
+    "quantity": 2
+  }
+}
+
+### Cancel Order
+POST http://localhost:3000/orders/<orderId>/cancel
+Authorization: Bearer <your_token_here>
+Content-Type: application/json
+
+{
+  "reason": "Customer request"
+}
