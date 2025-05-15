@@ -42,7 +42,7 @@ COPY --from=builder /service-auth/drizzle ./drizzle
 RUN npm install --only=production
 
 # Expose server port
-EXPOSE 8000
+EXPOSE 8001
 
 # Start the application
 CMD ["bash", "-c", "tsx dist/src/db/migrate.js && node dist/src/server.js"]
