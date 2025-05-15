@@ -7,7 +7,7 @@ metadata:
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
   ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
-  DB_HOST: "database-orders.database-aaw.svc.cluster.local"
+  DB_HOST: "database-orders.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "orders"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
@@ -87,7 +87,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: database-orders
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   replicas: 1
   selector:
@@ -134,7 +134,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: database-orders
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   type: ClusterIP
   selector:
@@ -149,7 +149,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: orders-pv
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   capacity:
     storage: 1Gi
@@ -165,7 +165,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: orders-pvc
-  namespace: database-aaw
+  namespace: backend-aaw
 spec:
   accessModes:
     - ReadWriteOnce
