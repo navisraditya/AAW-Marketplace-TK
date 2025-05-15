@@ -10,7 +10,7 @@ data:
   DB_HOST: "database-products.database-aaw.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "products"
-  PRODUCT_MS_URL: "http://products.products.svc.cluster.local:30002/api"
+  PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
   AUTH_URL: "http://authentication.backend-aaw.svc.cluster.local:30000/api"
   TENANT_URL: "http://tenants.backend-aaw.svc.cluster.local:30003/api"
   REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
@@ -29,6 +29,34 @@ data:
   DB_PASSWORD: "cG9zdGdyZXM="
   POSTGRES_PASSWORD: "cG9zdGdyZXM="
 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-db
+  namespace: database-aaw
+data:
+  TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
+  ADMIN_TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
+  DB_HOST: "database-auth.database-aaw.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "authentication"
+  PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
+  REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets-db
+  namespace: database-aaw
+type: Opaque
+data:
+  JWT_SECRET: "YXV0aF9tc19qd3Rfc2VjcmV0"
+  ADMIN_JWT_SECRET: "YWRtaW5fYXV0aF9tc2p3dF9zZWNyZXQ="
+  DB_USER: "cG9zdGdyZXM="
+  DB_PASSWORD: "cG9zdGdyZXM="
+  POSTGRES_PASSWORD: "cG9zdGdyZXM="
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -107,17 +135,17 @@ spec:
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: app-config
+              name: app-config-db
               key: DB_NAME
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-db
               key: DB_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-db
               key: DB_PASSWORD
 
         ports:

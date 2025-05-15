@@ -110,17 +110,17 @@ spec:
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: app-config
+              name: app-config-db
               key: DB_NAME
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-db
               key: DB_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-db
               key: DB_PASSWORD
 
         ports:
