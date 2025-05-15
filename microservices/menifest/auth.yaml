@@ -81,9 +81,6 @@ spec:
             name: app-config
         - secretRef:
             name: app-secrets
-        env:
-        - name: REDIS_URL
-          value: "redis.backend-aaw.svc.cluster.local:6379"
         volumeMounts:
         - name: auth-storage
           mountPath: /app/data
