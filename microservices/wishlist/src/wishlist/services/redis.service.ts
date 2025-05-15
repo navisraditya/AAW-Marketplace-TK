@@ -7,7 +7,14 @@ class RedisService {
 
   private constructor() {
     this.client = createClient({
-      url: process.env.REDIS_URL || 'redis://localhost:6379'
+      url: process.env.REDIS_URL,
+      socket: {
+        connectTimeout: 10000,   // max 10 s for initial connect
+        reconnectStrategy: (retries) => {
+          if (retries > 3) return new Error('Too many retries');
+          return Math.min(retries * 1000, 3000);
+        },
+      },
     });
 
     this.client.on('error', (err) => {
