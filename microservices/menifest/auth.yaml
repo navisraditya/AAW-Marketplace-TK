@@ -57,7 +57,7 @@ spec:
           mountPath: /app/data
         resources:
           requests:
-            cpu: "100m"  # 0.1 core
+            cpu: "200m"  # 0.1 core
             memory: "256Mi"
           limits:
             cpu: "200m"  # 0.2 core
@@ -188,6 +188,7 @@ spec:
     kind: Deployment
     name: authentication
   minReplicas: 2
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
