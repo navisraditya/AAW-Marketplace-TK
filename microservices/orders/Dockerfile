@@ -29,6 +29,7 @@ ENV NODE_ENV production
 # Set working directory
 WORKDIR /service-orders
 
+RUN npm install -g tsx
 # Copy built files from the previous stage
 COPY --from=builder /service-orders/dist ./dist
 COPY --from=builder /service-orders/package.json ./package.json
