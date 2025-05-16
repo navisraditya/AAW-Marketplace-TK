@@ -1,15 +1,36 @@
 import { Request, Response, NextFunction } from "express";
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import CircuitBreaker from "opossum";
 
-// Circuit breaker options
+const httpClient = axios.create({
+  timeout: 5000, 
+});
+
+const SERVER_TENANT_ID = process.env.TENANT_ID;
+
+axiosRetry(httpClient, {
+  retries: 3,
+  retryDelay: (retryCount) => {
+    const baseDelay = Math.pow(2, retryCount) * 300; 
+    const jitter = Math.random() * 100; 
+    return baseDelay + jitter;
+  },
+  retryCondition: (error) => {
+    return Boolean(
+      axiosRetry.isNetworkOrIdempotentRequestError(error) || 
+      error.code === 'ETIMEDOUT' || 
+      (error.response && error.response.status >= 500)
+    );
+  }
+});
+
 const circuitBreakerOptions = {
-  timeout: 10000, // 10 seconds timeout for the circuit breaker
-  errorThresholdPercentage: 50, // Open the circuit if 50% of requests fail
-  resetTimeout: 30000, // Close the circuit after 30 seconds
+  timeout: 10000, 
+  errorThresholdPercentage: 50, 
+  resetTimeout: 10000, 
   errorFilter: (error: any) => {
-    // Open the circuit for timeout, service-related errors, or HTTP 500 errors
-    const serviceErrors = ['ECONNABORTED', 'ECONNREFUSED', 'ENOTFOUND'];
+    const serviceErrors = ['ECONNABORTED', 'ECONNREFUSED', 'ENOTFOUND', 'EAI_AGAIN'];
     if (serviceErrors.includes(error.code)) {
       return false;
     }
@@ -21,12 +42,49 @@ const circuitBreakerOptions = {
 };
 
 const verifyTokenBreaker = new CircuitBreaker(async (token: string) => {
-  const response = await axios.post(`${process.env.AUTH_MS_URL}/user/verify-admin-token`, { token });
+  const response = await httpClient.post(`${process.env.AUTH_MS_URL}/user/verify-admin-token`, { token });
   if (response.status !== 200) {
     throw new Error("Invalid token");
   }
   return response.data;
 }, circuitBreakerOptions);
+
+verifyTokenBreaker.on('open', () => {
+  console.warn('Circuit breaker to auth service is now OPEN');
+});
+
+verifyTokenBreaker.on('halfOpen', () => {
+  console.log('Circuit breaker to auth service is now HALF-OPEN');
+});
+
+verifyTokenBreaker.on('close', () => {
+  console.log('Circuit breaker to auth service is now CLOSED');
+});
+
+const verifyTenantBreaker = new CircuitBreaker(async (token: string) => {
+  const response = await httpClient.post(`${process.env.TENANT_MS_URL}/tenant/${SERVER_TENANT_ID}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (response.status !== 200) {
+    throw new Error("Invalid token");
+  }
+  return response.data;
+}, circuitBreakerOptions);
+
+verifyTenantBreaker.on('open', () => {
+  console.warn('Circuit breaker to tenant service is now OPEN');
+});
+
+verifyTenantBreaker.on('halfOpen', () => {
+  console.log('Circuit breaker to tenant service is now HALF-OPEN');
+});
+
+verifyTenantBreaker.on('close', () => {
+  console.log('Circuit breaker to tenant service is now CLOSED');
+});
+
 
 export const verifyJWT = async (
   req: Request,
@@ -47,7 +105,6 @@ export const verifyJWT = async (
     if (error instanceof Error && error.message === "Breaker is open") {
       return res.status(503).send({ message: "Service unavailable" });
     }
-    console.log(error)
     return res.status(401).send({ message: "Invalid token" });
   }
 };
