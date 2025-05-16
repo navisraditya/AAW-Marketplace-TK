@@ -2,6 +2,12 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Rate, Trend } from 'k6/metrics';
 
+// Service-specific BASE_URLs
+const AUTH_BASE_URL = __ENV.AUTH_BASE_URL || 'http://52.204.141.213:30000';
+const PRODUCTS_BASE_URL = __ENV.PRODUCTS_BASE_URL || 'http://52.204.141.213:30002';
+const ORDERS_BASE_URL = __ENV.ORDERS_BASE_URL || 'http://52.204.141.213:30001';
+const TENANTS_BASE_URL = __ENV.TENANTS_BASE_URL || 'http://52.204.141.213:30003';
+
 function randomUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -20,7 +26,6 @@ const cartLatency = new Trend('cart_latency');
 const wishlistLatency = new Trend('wishlist_latency');
 const tenantLatency = new Trend('tenant_latency');
 
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000';
 const AUTH_TOKEN = __ENV.AUTH_TOKEN || '';
 const PREDEFINED_TENANT_ID = '47dd6b24-0b23-46b0-a662-776158d089ba';
 const PREDEFINED_USER_ID = 'fa50dd45-c9be-4991-90da-0bef80ff7cd3';
@@ -42,19 +47,15 @@ export const options = {
       executor: 'ramping-vus',
       startVUs: 25,
       stages: [
-        // 1 minute: frequent spiking to max VUs (simulate with quick ramps)
         { duration: '10s', target: 100 },
         { duration: '10s', target: 500 },
         { duration: '10s', target: 1000 },
         { duration: '30s', target: 25 },
-        // Minutes 2-5: ramp up to max VUs
         { duration: '1m', target: 250 },
         { duration: '1m', target: 500 },
         { duration: '1m', target: 750 },
         { duration: '1m', target: 1000 },
-        // Minutes 5-8: stay at max VUs
         { duration: '3m', target: 1000 },
-        // Minutes 8-10: ramp down to 0
         { duration: '2m', target: 0 },
       ],
       gracefulRampDown: '30s',
@@ -156,7 +157,7 @@ export const options = {
   },
 };
 
-function makeAuthRequest(method, url, body = null) {
+function makeAuthRequest(method, url, body = null, baseUrl = '') {
   const params = {
     headers: {
       'Content-Type': 'application/json',
@@ -165,189 +166,192 @@ function makeAuthRequest(method, url, body = null) {
   };
   let response;
   if (method === 'GET') {
-    response = http.get(url, params);
+    response = http.get(baseUrl + url, params);
   } else if (method === 'POST') {
-    response = http.post(url, JSON.stringify(body), params);
+    response = http.post(baseUrl + url, JSON.stringify(body), params);
   } else if (method === 'PUT') {
-    response = http.put(url, JSON.stringify(body), params);
+    response = http.put(baseUrl + url, JSON.stringify(body), params);
   } else if (method === 'DELETE') {
-    response = http.del(url, null, params);
+    response = http.del(baseUrl + url, null, params);
   }
   return response;
 }
 
-
 export function authTest() {
   const startTime = new Date();
 
-  const registerRes = http.post(`${BASE_URL}/user/register`, JSON.stringify({
-    email: `test${Date.now()}@example.com`,
-    password: 'testpassword123',
-    name: 'Test User',
+  const uniqueSuffix = `${Date.now()}${Math.floor(Math.random() * 10000)}`;
+  const username = `user${uniqueSuffix}`;
+  const email = `user${uniqueSuffix}@example.com`;
+  const phone_number = `+1${uniqueSuffix.padStart(10, '0')}`;
+
+  const registerRes = http.post(`${AUTH_BASE_URL}/user/register`, JSON.stringify({
+    username: username,
+    email: email,
+    password: "Password1",
+    full_name: "John Doe",
+    address: "123 Main Street, Anytown, USA",
+    phone_number: phone_number
   }), { headers: { 'Content-Type': 'application/json' } });
   check(registerRes, { 'register status is 201': (r) => r.status === 201 });
 
-  const loginRes = http.post(`${BASE_URL}/user/login`, JSON.stringify({
-    email: 'test@example.com',
-    password: 'testpassword123',
+  const loginRes = http.post(`${AUTH_BASE_URL}/user/login`, JSON.stringify({
+    email: email,
+    password: 'Password1',
   }), { headers: { 'Content-Type': 'application/json' } });
   check(loginRes, { 'login status is 200': (r) => r.status === 200 });
 
-  const verifyTokenRes = http.post(`${BASE_URL}/user/verify-token`, JSON.stringify({ token: AUTH_TOKEN }), { headers: { 'Content-Type': 'application/json' } });
+  const verifyTokenRes = http.post(`${AUTH_BASE_URL}/user/verify-token`, JSON.stringify({ token: AUTH_TOKEN }), { headers: { 'Content-Type': 'application/json' } });
   check(verifyTokenRes, { 'verify token status is 200': (r) => r.status === 200 });
 
-  const verifyAdminTokenRes = http.post(`${BASE_URL}/user/verify-admin-token`, JSON.stringify({ token: AUTH_TOKEN }), { headers: { 'Content-Type': 'application/json' } });
+  const verifyAdminTokenRes = http.post(`${AUTH_BASE_URL}/user/verify-admin-token`, JSON.stringify({ token: AUTH_TOKEN }), { headers: { 'Content-Type': 'application/json' } });
   check(verifyAdminTokenRes, { 'verify admin token status is 200': (r) => r.status === 200 });
   authLatency.add(new Date() - startTime);
   errorRate.add(registerRes.status !== 201 || loginRes.status !== 200);
   sleep(1);
 }
 
-
 export function productTest() {
   const startTime = new Date();
 
-  const productsRes = http.get(`${BASE_URL}/products`);
+  const productsRes = http.get(`${PRODUCTS_BASE_URL}/products`);
   check(productsRes, { 'products status is 200': (r) => r.status === 200 });
 
-  const categoriesRes = http.get(`${BASE_URL}/products/category`);
+  const categoriesRes = http.get(`${PRODUCTS_BASE_URL}/products/category`);
   check(categoriesRes, { 'categories status is 200': (r) => r.status === 200 });
 
   const productId = PRODUCT_ID;
-  const productByIdRes = http.get(`${BASE_URL}/products/${productId}`);
+  const productByIdRes = http.get(`${PRODUCTS_BASE_URL}/products/${productId}`);
   check(productByIdRes, { 'product by id status': (r) => [200, 404].includes(r.status) });
 
-  const manyProductsRes = http.post(`${BASE_URL}/products/many`, JSON.stringify({ ids: [randomUUID(), randomUUID()] }), { headers: { 'Content-Type': 'application/json' } });
+  const manyProductsRes = http.post(`${PRODUCTS_BASE_URL}/products/many`, JSON.stringify({ ids: [randomUUID(), randomUUID()] }), { headers: { 'Content-Type': 'application/json' } });
   check(manyProductsRes, { 'many products status': (r) => [200, 404].includes(r.status) });
 
-  const byCategoryRes = http.get(`${BASE_URL}/products/category/${CATEGORY_ID}`);
+  const byCategoryRes = http.get(`${PRODUCTS_BASE_URL}/products/category/${CATEGORY_ID}`);
   check(byCategoryRes, { 'by category status': (r) => [200, 404].includes(r.status) });
 
-  const createProductRes = makeAuthRequest('POST', `${BASE_URL}/products`, {
+  const createProductRes = makeAuthRequest('POST', `/products`, {
     tenant_id: TENANT_ID,
     name: `Product ${randomInt(1, 10000)}`,
     description: 'A test product',
     price: randomInt(1000, 100000),
     quantity_available: randomInt(1, 100),
     category_id: CATEGORY_ID,
-  });
+  }, PRODUCTS_BASE_URL);
   check(createProductRes, { 'create product status': (r) => [201, 200, 400].includes(r.status) });
 
-  const createCategoryRes = makeAuthRequest('POST', `${BASE_URL}/products/category`, {
+  const createCategoryRes = makeAuthRequest('POST', `/products/category`, {
     name: `Category ${randomInt(1, 10000)}`,
     tenant_id: TENANT_ID,
-  });
+  }, PRODUCTS_BASE_URL);
   check(createCategoryRes, { 'create category status': (r) => [201, 200, 400].includes(r.status) });
 
-  const editProductRes = makeAuthRequest('PUT', `${BASE_URL}/products/${productId}`, {
+  const editProductRes = makeAuthRequest('PUT', `/products/${productId}`, {
     name: `Product Updated ${randomInt(1, 10000)}`,
     price: randomInt(1000, 100000),
-  });
+  }, PRODUCTS_BASE_URL);
   check(editProductRes, { 'edit product status': (r) => [200, 404].includes(r.status) });
 
-  const editCategoryRes = makeAuthRequest('PUT', `${BASE_URL}/products/category/${CATEGORY_ID}`, {
+  const editCategoryRes = makeAuthRequest('PUT', `/products/category/${CATEGORY_ID}`, {
     name: `Category Updated ${randomInt(1, 10000)}`,
-  });
+  }, PRODUCTS_BASE_URL);
   check(editCategoryRes, { 'edit category status': (r) => [200, 404].includes(r.status) });
 
-  const deleteProductRes = makeAuthRequest('DELETE', `${BASE_URL}/products/${productId}`);
+  const deleteProductRes = makeAuthRequest('DELETE', `/products/${productId}`, null, PRODUCTS_BASE_URL);
   check(deleteProductRes, { 'delete product status': (r) => [200, 404].includes(r.status) });
 
-  const deleteCategoryRes = makeAuthRequest('DELETE', `${BASE_URL}/products/category/${CATEGORY_ID}`);
+  const deleteCategoryRes = makeAuthRequest('DELETE', `/products/category/${CATEGORY_ID}`, null, PRODUCTS_BASE_URL);
   check(deleteCategoryRes, { 'delete category status': (r) => [200, 404].includes(r.status) });
   productLatency.add(new Date() - startTime);
   errorRate.add(productsRes.status !== 200);
   sleep(1);
 }
 
-
 export function tenantTest() {
   const startTime = new Date();
 
   const tenantId = TENANT_ID;
-  const getTenantRes = makeAuthRequest('GET', `${BASE_URL}/tenant/${tenantId}`);
+  const getTenantRes = makeAuthRequest('GET', `/tenant/${tenantId}`, null, TENANTS_BASE_URL);
   check(getTenantRes, { 'get tenant status': (r) => [200, 404].includes(r.status) });
 
-  const createTenantRes = makeAuthRequest('POST', `${BASE_URL}/tenant`, {
+  const createTenantRes = makeAuthRequest('POST', `/tenant`, {
     owner_id: randomUUID(),
-  });
+  }, TENANTS_BASE_URL);
   check(createTenantRes, { 'create tenant status': (r) => [201, 200, 400].includes(r.status) });
 
-  const editTenantRes = makeAuthRequest('PUT', `${BASE_URL}/tenant/${tenantId}`, {
+  const editTenantRes = makeAuthRequest('PUT', `/tenant/${tenantId}`, {
     owner_id: randomUUID(),
-  });
+  }, TENANTS_BASE_URL);
   check(editTenantRes, { 'edit tenant status': (r) => [200, 404].includes(r.status) });
 
-  const deleteTenantRes = makeAuthRequest('DELETE', `${BASE_URL}/tenant`, {
+  const deleteTenantRes = makeAuthRequest('DELETE', `/tenant`, {
     id: tenantId,
-  });
+  }, TENANTS_BASE_URL);
   check(deleteTenantRes, { 'delete tenant status': (r) => [200, 404].includes(r.status) });
   tenantLatency.add(new Date() - startTime);
   errorRate.add(getTenantRes.status !== 200);
   sleep(1);
 }
 
-
 export function orderTest() {
   const startTime = new Date();
 
-  const ordersRes = makeAuthRequest('GET', `${BASE_URL}/orders`);
+  const ordersRes = makeAuthRequest('GET', `/orders`, null, ORDERS_BASE_URL);
   check(ordersRes, { 'orders status is 200': (r) => r.status === 200 });
 
   const orderId = randomUUID();
-  const orderDetailRes = makeAuthRequest('GET', `${BASE_URL}/orders/${orderId}`);
+  const orderDetailRes = makeAuthRequest('GET', `/orders/${orderId}`, null, ORDERS_BASE_URL);
   check(orderDetailRes, { 'order detail status': (r) => [200, 404].includes(r.status) });
 
-  const placeOrderRes = makeAuthRequest('POST', `${BASE_URL}/orders`, {
+  const placeOrderRes = makeAuthRequest('POST', `/orders`, {
     tenant_id: TENANT_ID,
     user_id: USER_ID,
     total_amount: randomInt(1000, 100000),
     shipping_provider: 'JNE',
     shipping_code: `SHIP${randomInt(1000,9999)}`,
     shipping_status: 'PENDING',
-  });
+  }, ORDERS_BASE_URL);
   check(placeOrderRes, { 'place order status': (r) => [201, 200, 400].includes(r.status) });
 
-  const payOrderRes = makeAuthRequest('POST', `${BASE_URL}/orders/${orderId}/pay`, {
+  const payOrderRes = makeAuthRequest('POST', `/orders/${orderId}/pay`, {
     payment_method: 'BANK_TRANSFER',
     payment_reference: `REF${randomInt(1000,9999)}`,
     amount: randomInt(1000, 100000),
-  });
+  }, ORDERS_BASE_URL);
   check(payOrderRes, { 'pay order status': (r) => [200, 404].includes(r.status) });
 
-  const cancelOrderRes = makeAuthRequest('POST', `${BASE_URL}/orders/${orderId}/cancel`, {
+  const cancelOrderRes = makeAuthRequest('POST', `/orders/${orderId}/cancel`, {
     reason: 'Test cancel',
-  });
+  }, ORDERS_BASE_URL);
   check(cancelOrderRes, { 'cancel order status': (r) => [200, 404].includes(r.status) });
   orderLatency.add(new Date() - startTime);
   errorRate.add(ordersRes.status !== 200);
   sleep(1);
 }
 
-
 export function cartTest() {
   const startTime = new Date();
 
-  const cartRes = makeAuthRequest('GET', `${BASE_URL}/cart`);
+  const cartRes = makeAuthRequest('GET', `/cart`, null, PRODUCTS_BASE_URL);
   check(cartRes, { 'cart status is 200': (r) => r.status === 200 });
 
-  const addItemRes = makeAuthRequest('POST', `${BASE_URL}/cart`, {
+  const addItemRes = makeAuthRequest('POST', `/cart`, {
     tenant_id: TENANT_ID,
     user_id: USER_ID,
     product_id: PRODUCT_ID,
     quantity: randomInt(1, 10),
-  });
+  }, PRODUCTS_BASE_URL);
   check(addItemRes, { 'add item status': (r) => [201, 200, 400].includes(r.status) });
 
-  const editCartRes = makeAuthRequest('PUT', `${BASE_URL}/cart`, {
+  const editCartRes = makeAuthRequest('PUT', `/cart`, {
     id: randomUUID(),
     quantity: randomInt(1, 10),
-  });
+  }, PRODUCTS_BASE_URL);
   check(editCartRes, { 'edit cart status': (r) => [200, 404].includes(r.status) });
 
-  const deleteCartRes = makeAuthRequest('DELETE', `${BASE_URL}/cart`, {
+  const deleteCartRes = makeAuthRequest('DELETE', `/cart`, {
     id: randomUUID(),
-  });
+  }, PRODUCTS_BASE_URL);
   check(deleteCartRes, { 'delete cart status': (r) => [200, 404].includes(r.status) });
   cartLatency.add(new Date() - startTime);
   errorRate.add(cartRes.status !== 200);
@@ -357,38 +361,38 @@ export function cartTest() {
 export function wishlistTest() {
   const startTime = new Date();
 
-  const wishlistRes = makeAuthRequest('GET', `${BASE_URL}/wishlist`);
+  const wishlistRes = makeAuthRequest('GET', `/wishlist`, null, PRODUCTS_BASE_URL);
   check(wishlistRes, { 'wishlist status is 200': (r) => r.status === 200 });
 
   const wishlistId = randomUUID();
-  const wishlistByIdRes = makeAuthRequest('GET', `${BASE_URL}/wishlist/${wishlistId}`);
+  const wishlistByIdRes = makeAuthRequest('GET', `/wishlist/${wishlistId}`, null, PRODUCTS_BASE_URL);
   check(wishlistByIdRes, { 'wishlist by id status': (r) => [200, 404].includes(r.status) });
 
-  const createWishlistRes = makeAuthRequest('POST', `${BASE_URL}/wishlist`, {
+  const createWishlistRes = makeAuthRequest('POST', `/wishlist`, {
     tenant_id: TENANT_ID,
     user_id: USER_ID,
     name: `Wishlist ${randomInt(1, 10000)}`,
-  });
+  }, PRODUCTS_BASE_URL);
   check(createWishlistRes, { 'create wishlist status': (r) => [201, 200, 400].includes(r.status) });
 
-  const updateWishlistRes = makeAuthRequest('PUT', `${BASE_URL}/wishlist/${wishlistId}`, {
+  const updateWishlistRes = makeAuthRequest('PUT', `/wishlist/${wishlistId}`, {
     name: `Wishlist Updated ${randomInt(1, 10000)}`,
-  });
+  }, PRODUCTS_BASE_URL);
   check(updateWishlistRes, { 'update wishlist status': (r) => [200, 404].includes(r.status) });
 
-  const removeProductRes = makeAuthRequest('DELETE', `${BASE_URL}/wishlist/remove`, {
+  const removeProductRes = makeAuthRequest('DELETE', `/wishlist/remove`, {
     wishlist_id: wishlistId,
     product_id: PRODUCT_ID,
-  });
+  }, PRODUCTS_BASE_URL);
   check(removeProductRes, { 'remove product status': (r) => [200, 404].includes(r.status) });
 
-  const deleteWishlistRes = makeAuthRequest('DELETE', `${BASE_URL}/wishlist/${wishlistId}`);
+  const deleteWishlistRes = makeAuthRequest('DELETE', `/wishlist/${wishlistId}`, null, PRODUCTS_BASE_URL);
   check(deleteWishlistRes, { 'delete wishlist status': (r) => [200, 404].includes(r.status) });
 
-  const addProductRes = makeAuthRequest('POST', `${BASE_URL}/wishlist/add`, {
+  const addProductRes = makeAuthRequest('POST', `/wishlist/add`, {
     wishlist_id: wishlistId,
     product_id: PRODUCT_ID,
-  });
+  }, PRODUCTS_BASE_URL);
   check(addProductRes, { 'add product status': (r) => [201, 200, 400].includes(r.status) });
   wishlistLatency.add(new Date() - startTime);
   errorRate.add(wishlistRes.status !== 200);
@@ -411,22 +415,22 @@ function randomChoice(arr) {
 
 function productBrowsingAndCartFlow(data) {
   let productId = pickId(PRODUCT_ID, randomUUID);
-  http.get(`${BASE_URL}/products/${productId}`);
-  http.post(`${BASE_URL}/cart`, JSON.stringify({ product_id: productId, user_id: pickId(USER_ID, randomUUID), quantity: 1, tenant_id: pickId(TENANT_ID, randomUUID) }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
+  http.get(`${PRODUCTS_BASE_URL}/products/${productId}`);
+  http.post(`${PRODUCTS_BASE_URL}/cart`, JSON.stringify({ product_id: productId, user_id: pickId(USER_ID, randomUUID), quantity: 1, tenant_id: pickId(TENANT_ID, randomUUID) }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
   if (data.cartIds.length > 0) {
     let cartId = data.cartIds[0];
-    http.put(`${BASE_URL}/cart`, JSON.stringify({ id: cartId, quantity: 2 }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
+    http.put(`${PRODUCTS_BASE_URL}/cart`, JSON.stringify({ id: cartId, quantity: 2 }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
   }
   if (data.cartIds.length > 0) {
     let cartId = data.cartIds[0];
-    http.del(`${BASE_URL}/cart`, JSON.stringify({ id: cartId }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
+    http.del(`${PRODUCTS_BASE_URL}/cart`, JSON.stringify({ id: cartId }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
   }
 }
 
 function orderPlacementAndPaymentFlow(data) {
-  http.get(`${BASE_URL}/cart?user_id=${USER_ID}`);
+  http.get(`${PRODUCTS_BASE_URL}/cart?user_id=${USER_ID}`);
 
-  let placeOrderRes = http.post(`${BASE_URL}/orders`, JSON.stringify({
+  let placeOrderRes = http.post(`${ORDERS_BASE_URL}/orders`, JSON.stringify({
     tenant_id: TENANT_ID,
     user_id: USER_ID,
     total_amount: Math.floor(Math.random() * 100000) + 1000,
@@ -440,23 +444,23 @@ function orderPlacementAndPaymentFlow(data) {
   } catch (e) {}
 
   if (orderId) {
-    http.post(`${BASE_URL}/orders/${orderId}/pay`, JSON.stringify({
+    http.post(`${ORDERS_BASE_URL}/orders/${orderId}/pay`, JSON.stringify({
       payment_method: 'BANK_TRANSFER',
       payment_reference: `REF${Math.floor(Math.random() * 10000)}`,
       amount: Math.floor(Math.random() * 100000) + 1000,
     }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
 
     if (Math.random() < 0.5) {
-      http.post(`${BASE_URL}/orders/${orderId}/cancel`, JSON.stringify({ reason: 'Test cancel' }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
+      http.post(`${ORDERS_BASE_URL}/orders/${orderId}/cancel`, JSON.stringify({ reason: 'Test cancel' }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
     }
   }
 }
 
 function wishlistFlow(data) {
   let productId = PRODUCT_ID;
-  http.get(`${BASE_URL}/products/${productId}`);
-  http.post(`${BASE_URL}/wishlist/add`, JSON.stringify({ wishlist_id: data.wishlistIds[0], product_id: productId }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
-  http.del(`${BASE_URL}/wishlist/remove`, JSON.stringify({ wishlist_id: data.wishlistIds[0], product_id: productId }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
+  http.get(`${PRODUCTS_BASE_URL}/products/${productId}`);
+  http.post(`${PRODUCTS_BASE_URL}/wishlist/add`, JSON.stringify({ wishlist_id: data.wishlistIds[0], product_id: productId }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
+  http.del(`${PRODUCTS_BASE_URL}/wishlist/remove`, JSON.stringify({ wishlist_id: data.wishlistIds[0], product_id: productId }), { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}` } });
 }
 
 export default function(data) {
