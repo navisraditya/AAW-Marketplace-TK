@@ -1,24 +1,22 @@
 version: '3.8'
 services:
-  # Node.js application service
   tenant-service:
     build: .
     environment:
-      - AUTH_MS_URL=http://auth-service:8000  # Added the missing service name
-      - DB_HOST=db
+      - AUTH_MS_URL=http://auth-service:8000
+      - DB_HOST=tenant-db
       - DB_PORT=5432
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://tenant-redis:6379
     ports:
       - "8003:8003"
     depends_on:
-      - db
-      - redis  # Added dependency on redis service
+      - tenant-db
+      - tenant-redis
     networks:
-      - tenant-network
-      - auth-network
+      - tenant-internal
+      - microservices-bridge
       
-  # PostgreSQL database service
-  db:
+  tenant-db:
     image: postgres:latest
     environment:
       POSTGRES_DB: postgres
@@ -27,15 +25,15 @@ services:
     ports:
       - "5431:5432"
     networks:
-      - tenant-network  # Added network for db
+      - tenant-internal
     
-  redis:
+  tenant-redis:
     image: redis:alpine
     ports:
       - "6380:6379"
-    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]  # Disabled protected mode
+    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
     networks:
-      - tenant-network  # Added network for redis
+      - tenant-internal
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -43,8 +41,9 @@ services:
       retries: 5
   
 networks:
-  tenant-network:
+  tenant-internal:
     driver: bridge
-  auth-network:
-    name: shared-microservices-network
+  microservices-bridge:
+    name: microservices-bridge
+    driver: bridge
     external: true
