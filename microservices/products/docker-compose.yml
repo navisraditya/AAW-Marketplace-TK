@@ -17,8 +17,8 @@ services:
       - db
       - redis
     networks:
-      - product-network
-      - auth-network
+      - product-internal
+      - microservices-bridge
 
 
   # PostgreSQL database service
@@ -29,9 +29,9 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5430:5432"
+      - "5433:5432"
     networks:
-      - product-network
+      - product-internal
 
   redis:
     image: redis:alpine
@@ -39,7 +39,7 @@ services:
       - "6381:6379"
     command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]  # Disabled protected mode
     networks:
-      - product-network  # Added network for redis
+      - product-internal # Added network for redis
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -48,8 +48,10 @@ services:
 
   
 networks:
-  product-network:
+  product-internal:
     driver: bridge
-  auth-network:
-    name: shared-microservices-network
+  microservices-bridge:
+    name: microservices-bridge
+    driver: bridge
     external: true
+
