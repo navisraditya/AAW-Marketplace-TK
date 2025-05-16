@@ -1,26 +1,52 @@
 version: '3.8'
-
 services:
-  # Node.js application service
-  microservice:
+  order-service:
     build: .
     environment:
       - TENANT_ID=47dd6b24-0b23-46b0-a662-776158d089ba
-      - AUTH_MS_URL=http://host.docker.internal:8000
-      - PRODUCT_MS_URL=http://host.docker.internal:8002
-      - DB_HOST=db
+      - ADMIN_TENANT_ID=47dd6b24-0b23-46b0-a662-776158d089ba
+      - AUTH_MS_URL=http://auth-service:8000
+      - DB_HOST=order-db
       - DB_PORT=5432
+      - REDIS_URL=redis://order-redis:6379
     ports:
-      - "8001:8001"
+      - "8004:8001"
     depends_on:
-      - db
-
-  # PostgreSQL database service
-  db:
+      - order-db
+      - order-redis
+    networks:
+      - order-internal
+      - microservices-bridge
+      
+  order-db:
     image: postgres:latest
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5428:5432"
+      - "5430:5432"
+    networks:
+      - order-internal
+    
+  order-redis:
+    image: redis:alpine
+    ports:
+      - "6381:6379"
+    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
+    networks:
+      - order-internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  
+networks:
+  order-internal:
+    driver: bridge
+  microservices-bridge:
+    name: microservices-bridge
+    driver: bridge
+    external: true
+

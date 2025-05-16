@@ -1,38 +1,38 @@
 import { Request, Response, NextFunction } from "express";
 import axios from 'axios';
-import axiosRetry from "axios-retry";
+import axiosRetry from 'axios-retry';
 import CircuitBreaker from "opossum";
 
-// Configure Axios with timeout and retry mechanism
 const httpClient = axios.create({
-  timeout: 15000, // 15 seconds timeout
+  timeout: 5000, 
 });
 
 axiosRetry(httpClient, {
-  retries: 3, // Retry up to 3 times
-  retryDelay: axiosRetry.exponentialDelay, // Exponential backoff
+  retries: 3,
+  retryDelay: (retryCount) => {
+    const baseDelay = Math.pow(2, retryCount) * 300; 
+    const jitter = Math.random() * 100; 
+    return baseDelay + jitter;
+  },
   retryCondition: (error) => {
-    // Retry on network errors, timeouts or 5xx server errors
-    return axiosRetry.isNetworkOrIdempotentRequestError(error) || 
-           error.code === 'ETIMEDOUT' || 
-           (error.response && error.response.status >= 500);
+    return Boolean(
+      axiosRetry.isNetworkOrIdempotentRequestError(error) || 
+      error.code === 'ETIMEDOUT' || 
+      (error.response && error.response.status >= 500)
+    );
   }
 });
 
-// Circuit breaker options
 const circuitBreakerOptions = {
-  timeout: 20000, // 20 seconds timeout for the circuit breaker (increased from 10s)
-  errorThresholdPercentage: 50, // Open the circuit if 50% of requests fail
-  resetTimeout: 30000, // Close the circuit after 30 seconds
+  timeout: 10000, 
+  errorThresholdPercentage: 50, 
+  resetTimeout: 10000, 
   errorFilter: (error: any) => {
-    // Open the circuit for timeout, service-related errors, or HTTP 500 errors
-    const serviceErrors = ['ECONNABORTED', 'ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT'];
+    const serviceErrors = ['ECONNABORTED', 'ECONNREFUSED', 'ENOTFOUND', 'EAI_AGAIN'];
     if (serviceErrors.includes(error.code)) {
-      console.log(`Network error detected: ${error.code}`);
       return false;
     }
-    if (error.response && error.response.status >= 500) {
-      console.log(`Server error detected: ${error.response.status}`);
+    if (error.response && error.response.status === 500) {
       return false;
     }
     return true;
@@ -40,13 +40,24 @@ const circuitBreakerOptions = {
 };
 
 const verifyTokenBreaker = new CircuitBreaker(async (token: string) => {
-  console.log(`Verifying token with auth service at: ${process.env.AUTH_MS_URL}/user/verify-token`);
   const response = await httpClient.post(`${process.env.AUTH_MS_URL}/user/verify-token`, { token });
   if (response.status !== 200) {
     throw new Error("Invalid token");
   }
   return response.data;
 }, circuitBreakerOptions);
+
+verifyTokenBreaker.on('open', () => {
+  console.warn('Circuit breaker to auth service is now OPEN');
+});
+
+verifyTokenBreaker.on('halfOpen', () => {
+  console.log('Circuit breaker to auth service is now HALF-OPEN');
+});
+
+verifyTokenBreaker.on('close', () => {
+  console.log('Circuit breaker to auth service is now CLOSED');
+});
 
 export const verifyJWT = async (
   req: Request,
@@ -67,7 +78,7 @@ export const verifyJWT = async (
     if (error instanceof Error && error.message === "Breaker is open") {
       return res.status(503).send({ message: "Service unavailable" });
     }
-    console.log(error)
     return res.status(401).send({ message: "Invalid token" });
   }
 };
+
