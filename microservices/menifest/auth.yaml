@@ -82,10 +82,6 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: DB_PASSWORD
-      - name: wait-for-redis
-        image: redis:alpine
-        command: ['sh', '-c', 
-          'until redis-cli -h redis.backend-aaw.svc.cluster.local ping; do echo waiting for redis; sleep 2; done;']
       containers:
       - name: authentication
         image: gnh374/authentication:latest
