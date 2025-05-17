@@ -47,14 +47,13 @@ export const options = {
       executor: 'ramping-vus',
       startVUs: 5,
       stages: [
-        { duration: '10s', target: 1000 },  // Spike up
-        { duration: '20s', target: 5 },     // Spike down
-        { duration: '30s', target: 100 },   // Regular load test starts
+        { duration: '30s', target: 50 },
+        { duration: '1m', target: 100 },
+        { duration: '1m', target: 200 },
         { duration: '1m', target: 300 },
+        { duration: '1m', target: 400 },
         { duration: '1m', target: 500 },
-        { duration: '1m', target: 700 },
-        { duration: '1m', target: 1000 },
-        { duration: '4m', target: 1000 },   // Extended steady state
+        { duration: '2m', target: 500 },
         { duration: '1m', target: 0 },
       ],
       gracefulRampDown: '30s',
@@ -63,14 +62,13 @@ export const options = {
       executor: 'ramping-vus',
       startVUs: 5,
       stages: [
-        { duration: '10s', target: 1000 },  // Spike up
-        { duration: '20s', target: 5 },     // Spike down
-        { duration: '30s', target: 100 },   // Regular load test starts
+        { duration: '30s', target: 50 },
+        { duration: '1m', target: 100 },
+        { duration: '1m', target: 200 },
         { duration: '1m', target: 300 },
+        { duration: '1m', target: 400 },
         { duration: '1m', target: 500 },
-        { duration: '1m', target: 700 },
-        { duration: '1m', target: 1000 },
-        { duration: '4m', target: 1000 },   // Extended steady state
+        { duration: '2m', target: 500 },
         { duration: '1m', target: 0 },
       ],
       gracefulRampDown: '30s',
@@ -79,14 +77,13 @@ export const options = {
       executor: 'ramping-vus',
       startVUs: 5,
       stages: [
-        { duration: '10s', target: 1000 },  // Spike up
-        { duration: '20s', target: 5 },     // Spike down
-        { duration: '30s', target: 100 },   // Regular load test starts
+        { duration: '30s', target: 50 },
+        { duration: '1m', target: 100 },
+        { duration: '1m', target: 200 },
         { duration: '1m', target: 300 },
+        { duration: '1m', target: 400 },
         { duration: '1m', target: 500 },
-        { duration: '1m', target: 700 },
-        { duration: '1m', target: 1000 },
-        { duration: '4m', target: 1000 },   // Extended steady state
+        { duration: '2m', target: 500 },
         { duration: '1m', target: 0 },
       ],
       gracefulRampDown: '30s',
@@ -95,14 +92,13 @@ export const options = {
       executor: 'ramping-vus',
       startVUs: 5,
       stages: [
-        { duration: '10s', target: 1000 },  // Spike up
-        { duration: '20s', target: 5 },     // Spike down
-        { duration: '30s', target: 100 },   // Regular load test starts
+        { duration: '30s', target: 50 },
+        { duration: '1m', target: 100 },
+        { duration: '1m', target: 200 },
         { duration: '1m', target: 300 },
+        { duration: '1m', target: 400 },
         { duration: '1m', target: 500 },
-        { duration: '1m', target: 700 },
-        { duration: '1m', target: 1000 },
-        { duration: '4m', target: 1000 },   // Extended steady state
+        { duration: '2m', target: 500 },
         { duration: '1m', target: 0 },
       ],
       gracefulRampDown: '30s',
@@ -111,14 +107,13 @@ export const options = {
       executor: 'ramping-vus',
       startVUs: 5,
       stages: [
-        { duration: '10s', target: 1000 },  // Spike up
-        { duration: '20s', target: 5 },     // Spike down
-        { duration: '30s', target: 100 },   // Regular load test starts
+        { duration: '30s', target: 50 },
+        { duration: '1m', target: 100 },
+        { duration: '1m', target: 200 },
         { duration: '1m', target: 300 },
+        { duration: '1m', target: 400 },
         { duration: '1m', target: 500 },
-        { duration: '1m', target: 700 },
-        { duration: '1m', target: 1000 },
-        { duration: '4m', target: 1000 },   // Extended steady state
+        { duration: '2m', target: 500 },
         { duration: '1m', target: 0 },
       ],
       gracefulRampDown: '30s',
@@ -127,14 +122,13 @@ export const options = {
       executor: 'ramping-vus',
       startVUs: 5,
       stages: [
-        { duration: '10s', target: 1000 },  // Spike up
-        { duration: '20s', target: 5 },     // Spike down
-        { duration: '30s', target: 100 },   // Regular load test starts
+        { duration: '30s', target: 50 },
+        { duration: '1m', target: 100 },
+        { duration: '1m', target: 200 },
         { duration: '1m', target: 300 },
+        { duration: '1m', target: 400 },
         { duration: '1m', target: 500 },
-        { duration: '1m', target: 700 },
-        { duration: '1m', target: 1000 },
-        { duration: '4m', target: 1000 },   // Extended steady state
+        { duration: '2m', target: 500 },
         { duration: '1m', target: 0 },
       ],
       gracefulRampDown: '30s',
@@ -283,7 +277,6 @@ export function productTest() {
     const editProductRes = makeRequest('PUT', `/product/${productId}`, {
       name: `Product Updated ${randomInt(1, 10000)}`,
       price: randomInt(1000, 100000),
-      user_id: USER_ID
     }, PRODUCTS_BASE_URL);
     check(editProductRes, { 'edit product status': (r) => [200, 404].includes(r.status) });
 
@@ -321,19 +314,16 @@ export function tenantTest() {
 
   const createTenantRes = makeAuthRequest('POST', `/tenant`, {
     owner_id: randomUUID(),
-    user_id: USER_ID
   }, TENANTS_BASE_URL);
   check(createTenantRes, { 'create tenant status': (r) => [201, 200, 400].includes(r.status) });
 
   const editTenantRes = makeAuthRequest('PUT', `/tenant/${tenantId}`, {
     owner_id: randomUUID(),
-    user_id: USER_ID
   }, TENANTS_BASE_URL);
   check(editTenantRes, { 'edit tenant status': (r) => [200, 404].includes(r.status) });
 
   const deleteTenantRes = makeAuthRequest('DELETE', `/tenant`, {
     id: tenantId,
-    user_id: USER_ID
   }, TENANTS_BASE_URL);
   check(deleteTenantRes, { 'delete tenant status': (r) => [200, 404].includes(r.status) });
   tenantLatency.add(new Date() - startTime);
@@ -409,15 +399,11 @@ export function cartTest() {
 export function wishlistTest() {
   const startTime = new Date();
 
-  const wishlistRes = makeAuthRequest('GET', `/wishlist`, {
-    user_id: USER_ID
-  }, PRODUCTS_BASE_URL);
+  const wishlistRes = makeAuthRequest('GET', `/wishlist`, null, PRODUCTS_BASE_URL);
   check(wishlistRes, { 'wishlist status is 200': (r) => r.status === 200 });
 
   const wishlistId = randomUUID();
-  const wishlistByIdRes = makeAuthRequest('GET', `/wishlist/${wishlistId}`, {
-    user_id: USER_ID
-  }, PRODUCTS_BASE_URL);
+  const wishlistByIdRes = makeAuthRequest('GET', `/wishlist/${wishlistId}`, null, PRODUCTS_BASE_URL);
   check(wishlistByIdRes, { 'wishlist by id status': (r) => [200, 404].includes(r.status) });
 
   const createWishlistRes = makeAuthRequest('POST', `/wishlist`, {
@@ -429,26 +415,21 @@ export function wishlistTest() {
 
   const updateWishlistRes = makeAuthRequest('PUT', `/wishlist/${wishlistId}`, {
     name: `Wishlist Updated ${randomInt(1, 10000)}`,
-    user_id: USER_ID
   }, PRODUCTS_BASE_URL);
   check(updateWishlistRes, { 'update wishlist status': (r) => [200, 404].includes(r.status) });
 
   const removeProductRes = makeAuthRequest('DELETE', `/wishlist/remove`, {
     wishlist_id: wishlistId,
     product_id: PRODUCT_ID,
-    user_id: USER_ID
   }, PRODUCTS_BASE_URL);
   check(removeProductRes, { 'remove product status': (r) => [200, 404].includes(r.status) });
 
-  const deleteWishlistRes = makeAuthRequest('DELETE', `/wishlist/${wishlistId}`, {
-    user_id: USER_ID
-  }, PRODUCTS_BASE_URL);
+  const deleteWishlistRes = makeAuthRequest('DELETE', `/wishlist/${wishlistId}`, null, PRODUCTS_BASE_URL);
   check(deleteWishlistRes, { 'delete wishlist status': (r) => [200, 404].includes(r.status) });
 
   const addProductRes = makeAuthRequest('POST', `/wishlist/add`, {
     wishlist_id: wishlistId,
     product_id: PRODUCT_ID,
-    user_id: USER_ID
   }, PRODUCTS_BASE_URL);
   check(addProductRes, { 'add product status': (r) => [201, 200, 400].includes(r.status) });
   wishlistLatency.add(new Date() - startTime);
