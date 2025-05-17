@@ -152,8 +152,9 @@ export const options = {
 };
 
 // Add request timeout and retry configuration
-const requestTimeout = '30s';
-const maxRetries = 3;
+const requestTimeout = '60s';  // Increased timeout
+const maxRetries = 5;         // Increased retries
+const initialRetryDelay = 2;  // Initial delay in seconds
 
 function makeRequest(method, url, body = null, baseUrl = '', retryCount = 0) {
   const params = {
@@ -162,6 +163,7 @@ function makeRequest(method, url, body = null, baseUrl = '', retryCount = 0) {
       'Authorization': `Bearer ${AUTH_TOKEN}`,
     },
     timeout: requestTimeout,
+    tags: { name: `${method} ${url}` },  // Add tags for better metrics
   };
 
   let response;
@@ -176,15 +178,21 @@ function makeRequest(method, url, body = null, baseUrl = '', retryCount = 0) {
       response = http.del(baseUrl + url, null, params);
     }
 
-    if (response.status >= 500 && retryCount < maxRetries) {
-      sleep(1);
+    // Check for connection errors or server errors
+    if ((response.status >= 500 || response.status === 0) && retryCount < maxRetries) {
+      const retryDelay = initialRetryDelay * Math.pow(2, retryCount); // Exponential backoff
+      console.log(`Request failed, retrying in ${retryDelay} seconds... (Attempt ${retryCount + 1}/${maxRetries})`);
+      sleep(retryDelay);
       return makeRequest(method, url, body, baseUrl, retryCount + 1);
     }
   } catch (error) {
     if (retryCount < maxRetries) {
-      sleep(1);
+      const retryDelay = initialRetryDelay * Math.pow(2, retryCount);
+      console.log(`Request failed with error: ${error.message}, retrying in ${retryDelay} seconds... (Attempt ${retryCount + 1}/${maxRetries})`);
+      sleep(retryDelay);
       return makeRequest(method, url, body, baseUrl, retryCount + 1);
     }
+    console.error(`Request failed after ${maxRetries} retries: ${error.message}`);
     throw error;
   }
 
