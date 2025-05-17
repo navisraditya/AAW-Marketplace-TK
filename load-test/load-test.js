@@ -86,6 +86,7 @@ export function authTest() {
   check(registerRes, { 'register status is 201': (r) => r.status === 201 });
   console.log(`Registration status: ${registerRes.status}`);
 
+  let token = '';
   if (registerRes.status === 201) {
     console.log(`Attempting to login user: ${username}`);
     const loginRes = http.post(`${AUTH_BASE_URL}/user/login`, JSON.stringify({
@@ -94,29 +95,45 @@ export function authTest() {
     }), { headers: { 'Content-Type': 'application/json' } });
     check(loginRes, { 'login status is 200': (r) => r.status === 200 });
     console.log(`Login status: ${loginRes.status}`);
+    
+    if (loginRes.status === 200) {
+      try {
+        const loginData = JSON.parse(loginRes.body);
+        token = loginData.token;
+        console.log('Successfully obtained auth token');
+      } catch (e) {
+        console.error('Failed to parse login response:', e);
+      }
+    }
   }
 
   const duration = new Date() - startTime;
   authLatency.add(duration);
   errorRate.add(registerRes.status !== 201);
   console.log(`Auth test completed in ${duration}ms`);
-  sleep(1);
+  
+  return token;
 }
 
 // Product test function
-export function productTest() {
+export function productTest(token) {
   const startTime = new Date();
   let productsRes;
   console.log('Starting product test...');
 
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+
   try {
     console.log('Fetching products list...');
-    productsRes = http.get(`${PRODUCTS_BASE_URL}/product`);
+    productsRes = http.get(`${PRODUCTS_BASE_URL}/product`, { headers });
     check(productsRes, { 'products status is 200': (r) => r.status === 200 });
     console.log(`Products fetch status: ${productsRes.status}`);
 
     console.log('Fetching categories...');
-    const categoriesRes = http.get(`${PRODUCTS_BASE_URL}/product/category`);
+    const categoriesRes = http.get(`${PRODUCTS_BASE_URL}/product/category`, { headers });
     check(categoriesRes, { 'categories status is 200': (r) => r.status === 200 });
     console.log(`Categories fetch status: ${categoriesRes.status}`);
 
@@ -127,7 +144,7 @@ export function productTest() {
       description: 'A test product',
       price: randomInt(1000, 100000),
       quantity_available: randomInt(1, 100),
-    }), { headers: { 'Content-Type': 'application/json' } });
+    }), { headers });
     check(createProductRes, { 'create product status': (r) => [201, 200, 400].includes(r.status) });
     console.log(`Product creation status: ${createProductRes.status}`);
 
@@ -144,14 +161,19 @@ export function productTest() {
 }
 
 // Order test function
-export function orderTest() {
+export function orderTest(token) {
   const startTime = new Date();
   let ordersRes;
   console.log('Starting order test...');
 
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+
   try {
     console.log('Fetching orders list...');
-    ordersRes = http.get(`${ORDERS_BASE_URL}/order`);
+    ordersRes = http.get(`${ORDERS_BASE_URL}/order`, { headers });
     check(ordersRes, { 'orders status is 200': (r) => r.status === 200 });
     console.log(`Orders fetch status: ${ordersRes.status}`);
 
@@ -162,7 +184,7 @@ export function orderTest() {
       shipping_provider: 'JNE',
       shipping_code: `SHIP${randomInt(1000,9999)}`,
       shipping_status: 'PENDING',
-    }), { headers: { 'Content-Type': 'application/json' } });
+    }), { headers });
     check(placeOrderRes, { 'place order status': (r) => [201, 200, 400].includes(r.status) });
     console.log(`Order creation status: ${placeOrderRes.status}`);
 
@@ -181,10 +203,18 @@ export function orderTest() {
 // Main test function
 export default function() {
   try {
-    const tests = [authTest, productTest, orderTest];
-    const randomTest = tests[Math.floor(Math.random() * tests.length)];
     console.log(`\n=== Starting new test iteration ===`);
-    randomTest();
+    // First authenticate
+    const token = authTest();
+    
+    if (token) {
+      // Only proceed with other tests if we have a valid token
+      const tests = [productTest, orderTest];
+      const randomTest = tests[Math.floor(Math.random() * tests.length)];
+      randomTest(token);
+    } else {
+      console.log('Skipping product and order tests due to authentication failure');
+    }
   } catch (error) {
     console.error('Error in default function:', error);
   } finally {
