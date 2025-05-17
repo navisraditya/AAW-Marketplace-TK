@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config
+  name: app-config-products
   namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
@@ -18,7 +18,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: app-secrets
+  name: app-secrets-product
   namespace: backend-aaw
 type: Opaque
 data:
@@ -32,7 +32,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config-db
+  name: app-config-products-db
   namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
@@ -47,7 +47,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: app-secrets-db
+  name: app-secrets-product-db
   namespace: backend-aaw
 type: Opaque
 data:
@@ -86,9 +86,9 @@ spec:
         - containerPort: 8002
         envFrom:
         - configMapRef:
-            name: app-config
+            name: app-config-products
         - secretRef:
-            name: app-secrets
+            name: app-secrets-product
         volumeMounts:
         - name: products-storage
           mountPath: /data
@@ -163,17 +163,17 @@ spec:
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: app-config
+              name: app-config-products
               key: DB_NAME
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-product
               key: DB_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-product
               key: DB_PASSWORD
 
         ports:

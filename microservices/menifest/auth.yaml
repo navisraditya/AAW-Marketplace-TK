@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config
+  name: app-config-auth
   namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
@@ -17,7 +17,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: app-secrets
+  name: app-secrets-auth
   namespace: backend-aaw
 type: Opaque
 data:
@@ -31,7 +31,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config-db
+  name: app-config-auth-db
   namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
@@ -46,7 +46,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: app-secrets-db
+  name: app-secrets-auth-db
   namespace: backend-aaw
 type: Opaque
 data:
@@ -80,7 +80,7 @@ spec:
         - name: PGPASSWORD
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-auth
               key: DB_PASSWORD
 
       containers:
@@ -90,9 +90,9 @@ spec:
         - containerPort: 8000
         envFrom:
         - configMapRef:
-            name: app-config
+            name: app-config-auth
         - secretRef:
-            name: app-secrets
+            name: app-secrets-auth
         volumeMounts:
         - name: auth-storage
           mountPath: /app/data
@@ -167,17 +167,17 @@ spec:
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: app-config
+              name: app-config-auth
               key: DB_NAME
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-auth
               key: DB_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-auth
               key: DB_PASSWORD
 
         ports:
@@ -264,7 +264,7 @@ spec:
     kind: Deployment
     name: authentication
   minReplicas: 2
-  maxReplicas: 6
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
