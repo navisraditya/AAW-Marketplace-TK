@@ -6,17 +6,17 @@ import { Product } from "@db/schema/products";
 
 export const getProductById = async (tenantId: string, id: string) => {
 
-    const cacheKey = `tenant:id:${tenantId}:${id}`;
+    //const cacheKey = `tenant:id:${tenantId}:${id}`;
 
     try {
         const cachedTenant= await redisService.get<Product>(cacheKey);
         if (cachedTenant) {
-            console.log(`Cache hit for product: ${tenantId}`);
+            console.log(`Cache hit for product: ${id}`);
             return cachedTenant;
         }
-        console.log(`Cache miss for product: ${tenantId}, fetching from database`);
+        console.log(`Cache miss for product: ${id}, fetching from database`);
     } catch (error) {
-        console.error(`Redis error when fetching product: ${tenantId}`, error);
+        console.error(`Redis error when fetching product: ${id}`, error);
     }
 
     
