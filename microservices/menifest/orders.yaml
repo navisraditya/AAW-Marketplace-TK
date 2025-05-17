@@ -85,7 +85,8 @@ spec:
               key: DB_PASSWORD
       - name: wait-for-auth
         image: busybox:1.28
-        command: ['sh', '-c', 'until nslookup authentication.backend-aaw.svc.cluster.local && nc -z authentication.backend-aaw.svc.cluster.local 30000; do echo "Waiting for auth service"; sleep 2; done;']      containers:
+        command: ['sh', '-c', 'until nslookup authentication.backend-aaw.svc.cluster.local && nc -z authentication.backend-aaw.svc.cluster.local 30000; do echo "Waiting for auth service"; sleep 2; done;']
+      containers:
       - name: orders
         image: gnh374/orders:latest
         ports:
@@ -101,6 +102,10 @@ spec:
         resources:
           requests:
             cpu: "200m"  # 0.1 core
+            memory: "256Mi"
+          limits:
+            cpu: "200m"  # 0.2 core
+            memory: "512Mi"
         startupProbe:
           httpGet:
             path: /health
@@ -122,20 +127,6 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
-            memory: "256Mi"
-          limits:
-            cpu: "200m"  # 0.2 core
-            memory: "512Mi"
-        startupProbe:
-          httpGet:
-            path: /health
-            port: 8001
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          failureThreshold: 30
-        livenessProbe:
-          httpGet:
-            path: /health
             port: 8001
           initialDelaySeconds: 30
           periodSeconds: 15
