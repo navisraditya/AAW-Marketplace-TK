@@ -237,7 +237,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
   hostPath:
-    path: "C:\\tmp\\data\\authentication"  # Changed to a more accessible local path
+    path: "/mnt/data/authentication"  # Changed to a more accessible local path
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
