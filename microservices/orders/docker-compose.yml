@@ -8,12 +8,11 @@ services:
       - AUTH_MS_URL=http://auth-service:8000
       - DB_HOST=order-db
       - DB_PORT=5432
-      - REDIS_URL=redis://order-redis:6379
+      - REDIS_URL=redis://redis:6379
     ports:
       - "8004:8001"
     depends_on:
       - order-db
-      - order-redis
     networks:
       - order-internal
       - microservices-bridge
@@ -28,19 +27,6 @@ services:
       - "5430:5432"
     networks:
       - order-internal
-    
-  order-redis:
-    image: redis:alpine
-    ports:
-      - "6381:6379"
-    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
-    networks:
-      - order-internal
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
   
 networks:
   order-internal:
