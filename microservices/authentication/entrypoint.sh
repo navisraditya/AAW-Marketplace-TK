@@ -30,9 +30,7 @@ if [ $migration_count -eq $MAX_MIGRATION_RETRIES ]; then
   exit 1
 fi
 
-echo "🔍 Checking if admin user exists"
-# Seed default admin if needed
-tsx dist/src/generateAdminToken.js
+
 
 echo "🚀 Starting service"
 node dist/src/server.js
