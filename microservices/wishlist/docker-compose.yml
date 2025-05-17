@@ -9,12 +9,11 @@ services:
       - AUTH_MS_URL=http://auth-service:8000
       - DB_HOST=wishlist-db
       - DB_PORT=5432
-      - REDIS_URL=redis://wishlist-redis:6379
+      - REDIS_URL=redis://redis:6379
     ports:
       - "8004:8004"
     depends_on:
       - wishlist-db
-      - wishlist-redis
     networks:
       - wishlist-internal
       - microservices-bridge
@@ -30,19 +29,6 @@ services:
       - "5429:5432"
     networks:
       - wishlist-internal
-
-  wishlist-redis:
-    image: redis:alpine
-    ports:
-      - "6381:6379"
-    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
-    networks:
-      - wishlist-internal
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
 networks:
   wishlist-internal:

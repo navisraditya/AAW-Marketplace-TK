@@ -6,18 +6,18 @@ import { Product } from "@db/schema/products";
 
 export const getProductById = async (tenantId: string, id: string) => {
 
-    const cacheKey = `tenant:id:${tenantId}:${id}`;
+//    const cacheKey = `tenant:id:${tenantId}:${id}`;
 
-    try {
-        const cachedTenant= await redisService.get<Product>(cacheKey);
-        if (cachedTenant) {
-            console.log(`Cache hit for product: ${tenantId}`);
-            return cachedTenant;
-        }
-        console.log(`Cache miss for product: ${tenantId}, fetching from database`);
-    } catch (error) {
-        console.error(`Redis error when fetching product: ${tenantId}`, error);
-    }
+//  try {
+//      const cachedTenant= await redisService.get<Product>(cacheKey);
+//      if (cachedTenant) {
+//          console.log(`Cache hit for product: ${id}`);
+//          return cachedTenant;
+//      }
+//      console.log(`Cache miss for product: ${id}, fetching from database`);
+//  } catch (error) {
+//      console.error(`Redis error when fetching product: ${id}`, error);
+//  }
 
     
     const result = await db
@@ -31,13 +31,13 @@ export const getProductById = async (tenantId: string, id: string) => {
                     )
     const product = result?.[0];
 
-    if (product) {
-        try {
-            await redisService.set(cacheKey, product, 3600);
-        } catch (error) {
-            console.error(`Redis error when setting product: ${id}`, error);
-        }
-    }
+//  if (product) {
+//      try {
+//          await redisService.set(cacheKey, product, 3600);
+//      } catch (error) {
+//          console.error(`Redis error when setting product: ${id}`, error);
+//      }
+//  }
 
     return product
 
