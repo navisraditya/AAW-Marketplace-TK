@@ -75,8 +75,14 @@ spec:
     spec:
       initContainers:
       - name: wait-for-db
-        image: busybox:1.28
-        command: ['sh', '-c', 'until nslookup database-orders.backend-aaw.svc.cluster.local && nc -z database-orders.backend-aaw.svc.cluster.local 5432; do echo "Waiting for database"; sleep 2; done;']
+        image: postgres:latest
+        command: ['sh', '-c', 'until pg_isready -h database-orders.backend-aaw.svc.cluster.local -p 5432 -U postgres; do echo "Waiting for database"; sleep 2; done;']
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DB_PASSWORD
       - name: wait-for-auth
         image: busybox:1.28
         command: ['sh', '-c', 'until nslookup authentication.backend-aaw.svc.cluster.local && nc -z authentication.backend-aaw.svc.cluster.local 30000; do echo "Waiting for auth service"; sleep 2; done;']
@@ -99,6 +105,27 @@ spec:
         resources:
           requests:
             cpu: "200m"  # 0.1 core
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
             memory: "256Mi"
           limits:
             cpu: "200m"  # 0.2 core

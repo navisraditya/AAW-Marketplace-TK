@@ -103,25 +103,7 @@ spec:
           limits:
             cpu: "200m"  # 0.2 core
             memory: "512Mi"
-        startupProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          failureThreshold: 30
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 30
-          periodSeconds: 15
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 15
-          periodSeconds: 5
+      
            
       volumes:
       - name: auth-storage
@@ -237,8 +219,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
   hostPath:
-    path: /mnt/data/authentication
-
+    path: "C:\\tmp\\data\\authentication"  # Changed to a more accessible local path
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
