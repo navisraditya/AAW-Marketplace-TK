@@ -74,8 +74,14 @@ spec:
     spec:
       initContainers:
       - name: wait-for-db
-        image: busybox
-        command: ['sh', '-c', 'until nslookup database-products.backend-aaw.svc.cluster.local && nc -z database-products.backend-aaw.svc.cluster.local 5432; do echo waiting for database; sleep 2; done;']
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nslookup database-products.backend-aaw.svc.cluster.local && nc -z database-products.backend-aaw.svc.cluster.local 5432; do echo "Waiting for database"; sleep 2; done;']
+      - name: wait-for-auth
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nslookup authentication.backend-aaw.svc.cluster.local && nc -z authentication.backend-aaw.svc.cluster.local 30000; do echo "Waiting for auth service"; sleep 2; done;']
+      - name: wait-for-redis
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nslookup redis.backend-aaw.svc.cluster.local && nc -z redis.backend-aaw.svc.cluster.local 6379; do echo "Waiting for Redis"; sleep 2; done;']
       containers:
       - name: products
         image: gnh374/products:latest
@@ -93,6 +99,28 @@ spec:
           requests:
             cpu: "200m"  # 0.1 core
             memory: "256Mi"
+          limits:
+            cpu: "200m"  # 0.2 core
+            memory: "512Mi"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 15
+          periodSeconds: 5
           limits:
             cpu: "200m"  # 0.2 core
             memory: "512Mi"

@@ -1,9 +1,8 @@
 #!/bin/bash
 
-echo "🚀 Starting the Orders microservice"
+echo "🚀 Starting the Products microservice"
 
 # Database availability is already checked by Kubernetes initContainers
-# Skip the redundant check here and focus on migration and app startup
 echo "🔍 Kubernetes initContainers have verified service availability"
 
 echo "🔄 Running database migrations with retry logic"

@@ -7,6 +7,7 @@ import express_prom_bundle from "express-prom-bundle";
 
 import userRoutes from './user/user.routes';
 import redisService from "./user/services/redis.service";
+import { pool } from "./db";
 
 const initServices = async () => {
   try {
