@@ -10,7 +10,7 @@ data:
   DB_HOST: "database-products.backend-aaw.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "products"
-  AUTH__MS_URL: "http://authentication.backend-aaw.svc.cluster.local:30000"
+  AUTH_MS_URL: "http://authentication.backend-aaw.svc.cluster.local:30000"
   TENANT_MS_URL: "http://tenants.backend-aaw.svc.cluster.local:30003"
   REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
 
@@ -72,6 +72,10 @@ spec:
       labels:
         app: products
     spec:
+      initContainers:
+      - name: wait-for-db
+        image: busybox
+        command: ['sh', '-c', 'until nslookup database-products.backend-aaw.svc.cluster.local && nc -z database-products.backend-aaw.svc.cluster.local 5432; do echo waiting for database; sleep 2; done;']
       containers:
       - name: products
         image: gnh374/products:latest

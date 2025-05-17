@@ -82,6 +82,10 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: DB_PASSWORD
+      initContainers:
+      - name: wait-for-db
+        image: busybox
+        command: ['sh', '-c', 'until nslookup database-auth.backend-aaw.svc.cluster.local && nc -z database-auth.backend-aaw.svc.cluster.local 5432; do echo waiting for database; sleep 2; done;']
       containers:
       - name: authentication
         image: gnh374/authentication:latest
