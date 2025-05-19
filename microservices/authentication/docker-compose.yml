@@ -11,10 +11,9 @@ services:
       - ADMIN_JWT_SECRET=auth_ms_jwt_secret
       - DB_HOST=auth-db
       - DB_PORT=5432
-      - REDIS_URL=redis://auth-redis:6379
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - auth-db
-      - auth-redis
     networks:
       - auth-internal
       - microservices-bridge
@@ -30,23 +29,11 @@ services:
     networks:
       - auth-internal
     
-  auth-redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
-    networks:
-      - auth-internal
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-  
 networks:
   auth-internal:
     driver: bridge
   microservices-bridge:
     name: microservices-bridge
     driver: bridge
+    external: true
 

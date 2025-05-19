@@ -61,15 +61,17 @@ verifyTokenBreaker.on('close', () => {
   console.log('Circuit breaker to auth service is now CLOSED');
 });
 
-const verifyTenantBreaker = new CircuitBreaker(async (token: string) => {
-  const response = await httpClient.post(`${process.env.TENANT_MS_URL}/tenant/${SERVER_TENANT_ID}`, {
+const verifyTenantBreaker = new CircuitBreaker(async (params: { token: string, tenantId: string }) => {
+  const response = await httpClient.get(`${process.env.TENANT_MS_URL}/tenant/${params.tenantId}`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${params.token}`,
     },
   });
+  
   if (response.status !== 200) {
-    throw new Error("Invalid token");
+    throw new Error("Tenant not found");
   }
+  
   return response.data;
 }, circuitBreakerOptions);
 
@@ -85,7 +87,6 @@ verifyTenantBreaker.on('close', () => {
   console.log('Circuit breaker to tenant service is now CLOSED');
 });
 
-
 export const verifyJWT = async (
   req: Request,
   res: Response,
@@ -97,14 +98,47 @@ export const verifyJWT = async (
       return res.status(401).send({ message: "Invalid token" });
     }
 
-    const payload = await verifyTokenBreaker.fire(token);
-
-    req.body.user = payload.user;
-    next();
-  } catch (error) {
-    if (error instanceof Error && error.message === "Breaker is open") {
-      return res.status(503).send({ message: "Service unavailable" });
+    if (!SERVER_TENANT_ID) {
+      return res.status(500).send({ message: "Server Tenant ID not found" });
     }
+
+    let authPayload;
+    try {
+      authPayload = await verifyTokenBreaker.fire(token);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Breaker is open") {
+        return res.status(503).send({ message: "Auth service unavailable" });
+      }
+      return res.status(401).send({ message: "Invalid token" });
+    }
+
+    let tenantPayload;
+    try {
+      tenantPayload = await verifyTenantBreaker.fire({ 
+        token, 
+        tenantId: SERVER_TENANT_ID 
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message === "Breaker is open") {
+        return res.status(503).send({ message: "Tenant service unavailable" });
+      }
+      return res.status(500).send({ message: "Server Tenant not found" });
+    }
+
+    if (authPayload.user.id !== tenantPayload.tenants.owner_id) {
+      return res.status(401).send({ message: "Unauthorized: Not tenant owner" });
+    }
+
+    req.body.user = authPayload.user;
+    next();
+
+  } catch (error) {
+    const errorDetails = {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      name: error instanceof Error ? error.name : 'Error',
+    };
+    
+    console.error('JWT verification error:', errorDetails);
     return res.status(401).send({ message: "Invalid token" });
   }
 };

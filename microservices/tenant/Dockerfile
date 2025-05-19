@@ -36,6 +36,10 @@ RUN npm install -g tsx
 COPY --from=builder /service-tenant/dist ./dist
 COPY --from=builder /service-tenant/package.json ./package.json
 COPY --from=builder /service-tenant/drizzle ./drizzle
+COPY ./entrypoint.sh ./entrypoint.sh
+
+# Make entrypoint executable
+RUN chmod +x ./entrypoint.sh
 
 # Install production dependencies only
 RUN npm install --only=production
@@ -44,5 +48,5 @@ RUN npm install --only=production
 EXPOSE 8003
 
 # Start the application
-CMD ["bash", "-c", "tsx dist/src/db/migrate.js && node dist/src/server.js"]
+CMD ["./entrypoint.sh"]
 

@@ -7,6 +7,7 @@ import express_prom_bundle from "express-prom-bundle";
 
 import userRoutes from './user/user.routes';
 import redisService from "./user/services/redis.service";
+import { pool } from "./db";
 
 const initServices = async () => {
   try {
@@ -29,6 +30,26 @@ const app = express();
 app.use(metricsMiddleware);
 app.use(cors());
 app.use(express.json());
+
+// Add main health check endpoint for Kubernetes probes
+app.get("/health", async (req, res) => {
+  try {
+    // Check database connection
+    const dbClient = await pool.connect();
+    try {
+      await dbClient.query('SELECT 1');
+      dbClient.release();
+      return res.status(200).json({ status: 'ok', database: 'connected' });
+    } catch (dbError) {
+      dbClient.release();
+      console.error('❌ Database health check failed:', dbError);
+      return res.status(503).json({ status: 'error', database: 'disconnected' });
+    }
+  } catch (error) {
+    console.error('❌ Health check failed:', error);
+    return res.status(503).json({ status: 'error' });
+  }
+});
 
 app.get("/health/redis", async (req, res) => {
   try {
@@ -68,8 +89,36 @@ const startApp = async () => {
   process.on('SIGTERM', async () => {
     console.log('SIGTERM received, shutting down gracefully');
     
-    // Close Redis connection
-    await redisService.disconnect();
+    try {
+      // Close Redis connection
+      await redisService.disconnect();
+      console.log('Redis connection closed');
+      
+      // Close database pool
+      await pool.end();
+      console.log('Database connections closed');
+    } catch (error) {
+      console.error('Error during graceful shutdown:', error);
+    }
+    
+    process.exit(0);
+  });
+  
+  // Also handle SIGINT (Ctrl+C)
+  process.on('SIGINT', async () => {
+    console.log('SIGINT received, shutting down gracefully');
+    
+    try {
+      // Close Redis connection
+      await redisService.disconnect();
+      console.log('Redis connection closed');
+      
+      // Close database pool
+      await pool.end();
+      console.log('Database connections closed');
+    } catch (error) {
+      console.error('Error during graceful shutdown:', error);
+    }
     
     process.exit(0);
   });

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config
+  name: app-config-wishlist
   namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
@@ -12,12 +12,12 @@ data:
   DB_NAME: "wishlists"
   PRODUCT_MS_URL: "http://products.backend-aaw.svc.cluster.local:30002/api"
   REDIS_URL: "redis://redis.backend-aaw.svc.cluster.local:6379"
-  AUTH_MS_URL: "http://products.backend-aaw.svc.cluster.local:30000"
+  AUTH_MS_URL: "http://authentication.backend-aaw.svc.cluster.local:30000"
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: app-secrets
+  name: app-secrets-wishlist
   namespace: backend-aaw
 type: Opaque
 data:
@@ -31,7 +31,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config-db
+  name: app-config-wishlist-db
   namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
@@ -46,7 +46,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: app-secrets-db
+  name: app-secrets-wishlist-db
   namespace: backend-aaw
 type: Opaque
 data:
@@ -71,6 +71,19 @@ spec:
       labels:
         app: wishlists
     spec:
+      initContainers:
+      - name: wait-for-db
+        image: postgres:latest
+        command: ['sh', '-c', 'until pg_isready -h database-wishlists.backend-aaw.svc.cluster.local -p 5432 -U postgres; do echo "Waiting for database"; sleep 2; done;']
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets-wishlist
+              key: DB_PASSWORD
+      - name: wait-for-auth
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nslookup authentication.backend-aaw.svc.cluster.local && nc -z authentication.backend-aaw.svc.cluster.local 30000; do echo "Waiting for auth service"; sleep 2; done;']
       containers:
       - name: wishlists
         image: gnh374/wishlists:latest
@@ -78,24 +91,45 @@ spec:
         - containerPort: 8004
         envFrom:
         - configMapRef:
-            name: app-config
+            name: app-config-wishlist
         - secretRef:
-            name: app-secrets
+            name: app-secrets-wishlist
         envFrom:
         - configMapRef:
-            name: app-config
+            name: app-config-wishlist
         - secretRef:
-            name: app-secrets
+            name: app-secrets-wishlist
         resources:
           requests:
-            cpu: "200m"  # 0.1 core
+            cpu: "250m"  # 0.1 core
             memory: "256Mi"
           limits:
-            cpu: "200m"  # 0.2 core
+            cpu: "350m"  # 0.2 core
             memory: "512Mi"
         volumeMounts:
         - name: wishlists-storage
           mountPath: /data
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
       volumes:
       - name: wishlists-storage
         emptyDir: {}
@@ -139,17 +173,17 @@ spec:
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: app-config
+              name: app-config-wishlist
               key: DB_NAME
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-wishlist
               key: DB_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-wishlist
               key: DB_PASSWORD
 
         ports:

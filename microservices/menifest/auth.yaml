@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config
+  name: app-config-auth
   namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
@@ -17,7 +17,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: app-secrets
+  name: app-secrets-auth
   namespace: backend-aaw
 type: Opaque
 data:
@@ -31,7 +31,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config-db
+  name: app-config-auth-db
   namespace: backend-aaw
 data:
   TENANT_ID: "47dd6b24-0b23-46b0-a662-776158d089ba"
@@ -46,7 +46,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: app-secrets-db
+  name: app-secrets-auth-db
   namespace: backend-aaw
 type: Opaque
 data:
@@ -71,6 +71,18 @@ spec:
       labels:
         app: authentication
     spec:
+      initContainers:
+      - name: wait-for-db
+        image: postgres:latest
+        command: ['sh', '-c', 
+          'until pg_isready -h database-auth.backend-aaw.svc.cluster.local -p 5432 -U postgres; do echo "Waiting for database"; sleep 2; done;']
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets-auth
+              key: DB_PASSWORD
+
       containers:
       - name: authentication
         image: gnh374/authentication:latest
@@ -78,19 +90,38 @@ spec:
         - containerPort: 8000
         envFrom:
         - configMapRef:
-            name: app-config
+            name: app-config-auth
         - secretRef:
-            name: app-secrets
+            name: app-secrets-auth
         volumeMounts:
         - name: auth-storage
           mountPath: /app/data
         resources:
           requests:
-            cpu: "200m"  # 0.1 core
+            cpu: "250m"  # 0.1 core
             memory: "256Mi"
           limits:
-            cpu: "200m"  # 0.2 core
+            cpu: "500m"  # 0.2 core
             memory: "512Mi"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 5
            
       volumes:
       - name: auth-storage
@@ -136,17 +167,17 @@ spec:
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: app-config
+              name: app-config-auth
               key: DB_NAME
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-auth
               key: DB_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: app-secrets
+              name: app-secrets-auth
               key: DB_PASSWORD
 
         ports:
@@ -206,8 +237,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
   hostPath:
-    path: /mnt/data/authentication
-
+    path: "/mnt/data/authentication"  # Changed to a more accessible local path
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -234,7 +264,7 @@ spec:
     kind: Deployment
     name: authentication
   minReplicas: 2
-  maxReplicas: 6
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:

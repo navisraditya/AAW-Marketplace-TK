@@ -6,12 +6,11 @@ services:
       - AUTH_MS_URL=http://auth-service:8000
       - DB_HOST=tenant-db
       - DB_PORT=5432
-      - REDIS_URL=redis://tenant-redis:6379
+      - REDIS_URL=redis://redis:6379
     ports:
       - "8003:8003"
     depends_on:
       - tenant-db
-      - tenant-redis
     networks:
       - tenant-internal
       - microservices-bridge
@@ -27,19 +26,6 @@ services:
     networks:
       - tenant-internal
     
-  tenant-redis:
-    image: redis:alpine
-    ports:
-      - "6380:6379"
-    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
-    networks:
-      - tenant-internal
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-  
 networks:
   tenant-internal:
     driver: bridge

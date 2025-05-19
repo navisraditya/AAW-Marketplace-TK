@@ -40,8 +40,12 @@ COPY --from=builder /service-products/drizzle ./drizzle
 # Install production dependencies only
 RUN npm install --only=production
 
+# Copy the entrypoint script
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
 # Expose server port
 EXPOSE 8002
 
-# Start the application
-CMD ["bash", "-c", "tsx dist/src/db/migrate.js && node dist/src/server.js"]
+# Start the application using the entrypoint script
+CMD ["./entrypoint.sh"]
