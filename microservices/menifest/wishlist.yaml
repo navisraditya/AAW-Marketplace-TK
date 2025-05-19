@@ -101,10 +101,10 @@ spec:
             name: app-secrets-wishlist
         resources:
           requests:
-            cpu: "200m"  # 0.1 core
+            cpu: "250m"  # 0.1 core
             memory: "256Mi"
           limits:
-            cpu: "200m"  # 0.2 core
+            cpu: "350m"  # 0.2 core
             memory: "512Mi"
         volumeMounts:
         - name: wishlists-storage

@@ -98,10 +98,10 @@ spec:
           mountPath: /app/data
         resources:
           requests:
-            cpu: "200m"  # 0.1 core
+            cpu: "250m"  # 0.1 core
             memory: "256Mi"
           limits:
-            cpu: "200m"  # 0.2 core
+            cpu: "500m"  # 0.2 core
             memory: "512Mi"
         startupProbe:
           httpGet:
