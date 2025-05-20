@@ -173,6 +173,39 @@ function isServerError(status) {
   return status === 500 || status === 0;
 }
 
+
+
+// MULAI RUN TEST
+
+// Setup function to seed data before running tests
+export function setup() {
+  console.log('Starting data seeding...');
+  
+  // Seed Users
+  let userSeedRes = http.get(`${AUTH_BASE_URL}/user/seed-user`);
+  console.log(`User seeding status: ${userSeedRes.status}`);
+  check(userSeedRes, {
+    'user seeding successful': (r) => r.status === 200 || r.status === 201
+  });
+
+  // Seed Products
+  let productSeedRes = http.get(`${PRODUCTS_BASE_URL}/product/seed-seed`);
+  console.log(`Product seeding status: ${productSeedRes.status}`);
+  check(productSeedRes, {
+    'product seeding successful': (r) => r.status === 200 || r.status === 201
+  });
+
+  // Seed Orders
+  let orderSeedRes = http.get(`${ORDERS_BASE_URL}/order/seed-seed`);
+  console.log(`Order seeding status: ${orderSeedRes.status}`);
+  check(orderSeedRes, {
+    'order seeding successful': (r) => r.status === 200 || r.status === 201
+  });
+
+  console.log('Data seeding completed');
+  return {};
+}
+
 // --- Scenario Functions ---
 
 export function authScenario() {
