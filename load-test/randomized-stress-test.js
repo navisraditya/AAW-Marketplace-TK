@@ -70,43 +70,43 @@ export let options = {
   scenarios: {
     auth: {
       executor: 'ramping-vus',
-      startVUs: 0,
+      startVUs: 500,
       stages: [
-        { duration: '5s', target: 100 },    // Initial spike
-        { duration: '55s', target: 5 },     // Quick ramp-down
-        { duration: '4m', target: 100 },    // Slow ramp-up
-        { duration: '4m', target: 100 },    // Maintain max load
-        { duration: '1m', target: 0 },       // Aggressive ramp-down
+        { duration: '5s', target: 500},    // Initial spike
+        { duration: '55s', target: 0},   // Quick ramp-down
+        { duration: '4m', target: 500},    // Slow ramp-up
+        { duration: '4m', target: 500},    // Maintain max load
+        { duration: '1m', target: 0},       // Aggressive ramp-down
       ],
       exec: 'authScenario',
     },
     products: {
       executor: 'ramping-vus',
-      startVUs: 0,
+      startVUs: 500,
       stages: [
-        { duration: '5s', target: 100 },    // Initial spike
-        { duration: '55s', target: 5 },     // Quick ramp-down
-        { duration: '4m', target: 100 },    // Slow ramp-up
-        { duration: '4m', target: 100 },    // Maintain max load
-        { duration: '1m', target: 0 },       // Aggressive ramp-down
+        { duration: '5s', target: 500},    // Initial spike
+        { duration: '55s', target: 0},   // Quick ramp-down
+        { duration: '4m', target: 500},    // Slow ramp-up
+        { duration: '4m', target: 500},    // Maintain max load
+        { duration: '1m', target: 0},       // Aggressive ramp-down
       ],
       exec: 'productsScenario',
     },
     orders: {
       executor: 'ramping-vus',
-      startVUs: 0,
+      startVUs: 500,
       stages: [
-        { duration: '5s', target: 100 },    // Initial spike
-        { duration: '55s', target: 5 },     // Quick ramp-down
-        { duration: '4m', target: 100 },    // Slow ramp-up
-        { duration: '4m', target: 100 },    // Maintain max load
-        { duration: '1m', target: 0 },       // Aggressive ramp-down
+        { duration: '5s', target: 500},    // Initial spike
+        { duration: '55s', target: 0},   // Quick ramp-down
+        { duration: '4m', target: 500},    // Slow ramp-up
+        { duration: '4m', target: 500},    // Maintain max load
+        { duration: '1m', target: 0},       // Aggressive ramp-down
       ],
       exec: 'ordersScenario',
     },
     // cart: {
     //   executor: 'ramping-vus',
-    //   startVUs: 0,
+    //   startVUs: 500,
     //   stages: [
     //     { duration: '5s', target: 100 },    // Initial spike
     //     { duration: '55s', target: 5 },     // Quick ramp-down
@@ -118,13 +118,13 @@ export let options = {
     // },
     wishlist: {
       executor: 'ramping-vus',
-      startVUs: 0,
+      startVUs: 500,
       stages: [
-        { duration: '5s', target: 100 },    // Initial spike
-        { duration: '55s', target: 5 },     // Quick ramp-down
-        { duration: '4m', target: 100 },    // Slow ramp-up
-        { duration: '4m', target: 100 },    // Maintain max load
-        { duration: '1m', target: 0 },       // Aggressive ramp-down
+        { duration: '5s', target: 500},    // Initial spike
+        { duration: '55s', target: 0},   // Quick ramp-down
+        { duration: '4m', target: 500},    // Slow ramp-up
+        { duration: '4m', target: 500},    // Maintain max load
+        { duration: '1m', target: 0},       // Aggressive ramp-down
       ],
       exec: 'wishlistScenario',
     },
@@ -163,6 +163,16 @@ function getUserId() {
   });
 }
 
+// Helper function to check if status code is an error
+function isErrorStatus(status) {
+  return status >= 400 && status < 600;
+}
+
+// Helper function to check if status code is 500 or 0 (network error)
+function isServerError(status) {
+  return status === 500 || status === 0;
+}
+
 // --- Scenario Functions ---
 
 export function authScenario() {
@@ -181,13 +191,13 @@ export function authScenario() {
     username, email, password, full_name, address, phone_number
   }), { headers: { 'Content-Type': 'application/json' } });
   actionsLog.push(`Register: status ${regRes.status}`);
-  let regOk = regRes.status !== 500;
+  let regOk = !isServerError(regRes.status);
   if (!regOk) errors++;
 
   // Login
   let loginRes = http.post(`${AUTH_BASE_URL}/user/login`, JSON.stringify({ username, password }), { headers: { 'Content-Type': 'application/json' } });
   actionsLog.push(`Login: status ${loginRes.status}`);
-  let loginOk = loginRes.status !== 500;
+  let loginOk = !isServerError(loginRes.status);
   if (!loginOk) errors++;
   let token = '';
   if (loginOk) {
@@ -256,17 +266,17 @@ export function productsScenario() {
   let categoryId = getRandomUUID('products', 'categoryIds') || randomString(8);
 
   let actions = [
-    () => { let r = http.get(`${PRODUCTS_BASE_URL}/product`, { headers }); actionsLog.push(`Get all products: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.post(`${PRODUCTS_BASE_URL}/product/many`, JSON.stringify({ productIds: [productId, randomString(8)] }), { headers }); actionsLog.push(`Get many products: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.get(`${PRODUCTS_BASE_URL}/product/${productId}`, { headers }); actionsLog.push(`Get product by ID: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.get(`${PRODUCTS_BASE_URL}/product/category/${categoryId}`, { headers }); actionsLog.push(`Get product by category: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.post(`${PRODUCTS_BASE_URL}/product`, JSON.stringify({ name: `Product ${randomString(5)}`, description: 'desc', price: randomInt(1000, 10000), quantity_available: randomInt(1, 10), category_id: categoryId }), { headers }); actionsLog.push(`Create product: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.put(`${PRODUCTS_BASE_URL}/product/${productId}`, JSON.stringify({ name: `Edit Product ${randomString(5)}`, description: 'desc', price: randomInt(1000, 10000), quantity_available: randomInt(1, 10), category_id: categoryId }), { headers }); actionsLog.push(`Edit product: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.del(`${PRODUCTS_BASE_URL}/product/${productId}`, null, { headers }); actionsLog.push(`Delete product: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.get(`${PRODUCTS_BASE_URL}/product/category`, { headers }); actionsLog.push(`Get all categories: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.post(`${PRODUCTS_BASE_URL}/product/category`, JSON.stringify({ name: `Category ${randomString(5)}` }), { headers }); actionsLog.push(`Create category: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.put(`${PRODUCTS_BASE_URL}/product/category/${categoryId}`, JSON.stringify({ name: `EditCat ${randomString(5)}` }), { headers }); actionsLog.push(`Edit category: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
-    () => { let r = http.del(`${PRODUCTS_BASE_URL}/product/category/${categoryId}`, null, { headers }); actionsLog.push(`Delete category: status ${r.status}`); if (r.status === 500) errors++; errorRates.products.add(r.status === 500); },
+    () => { let r = http.get(`${PRODUCTS_BASE_URL}/product`, { headers }); actionsLog.push(`Get all products: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.post(`${PRODUCTS_BASE_URL}/product/many`, JSON.stringify({ productIds: [productId, randomString(8)] }), { headers }); actionsLog.push(`Get many products: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.get(`${PRODUCTS_BASE_URL}/product/${productId}`, { headers }); actionsLog.push(`Get product by ID: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.get(`${PRODUCTS_BASE_URL}/product/category/${categoryId}`, { headers }); actionsLog.push(`Get product by category: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.post(`${PRODUCTS_BASE_URL}/product`, JSON.stringify({ name: `Product ${randomString(5)}`, description: 'desc', price: randomInt(1000, 10000), quantity_available: randomInt(1, 10), category_id: categoryId }), { headers }); actionsLog.push(`Create product: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.put(`${PRODUCTS_BASE_URL}/product/${productId}`, JSON.stringify({ name: `Edit Product ${randomString(5)}`, description: 'desc', price: randomInt(1000, 10000), quantity_available: randomInt(1, 10), category_id: categoryId }), { headers }); actionsLog.push(`Edit product: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.del(`${PRODUCTS_BASE_URL}/product/${productId}`, null, { headers }); actionsLog.push(`Delete product: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.get(`${PRODUCTS_BASE_URL}/product/category`, { headers }); actionsLog.push(`Get all categories: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.post(`${PRODUCTS_BASE_URL}/product/category`, JSON.stringify({ name: `Category ${randomString(5)}` }), { headers }); actionsLog.push(`Create category: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.put(`${PRODUCTS_BASE_URL}/product/category/${categoryId}`, JSON.stringify({ name: `EditCat ${randomString(5)}` }), { headers }); actionsLog.push(`Edit category: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
+    () => { let r = http.del(`${PRODUCTS_BASE_URL}/product/category/${categoryId}`, null, { headers }); actionsLog.push(`Delete category: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.products.add(isServerError(r.status)); },
   ];
   let n = randomInt(2, 4);
   for (let i = 0; i < n; i++) {
@@ -285,9 +295,20 @@ export function ordersScenario() {
   let actionsLog = [];
   let errors = 0;
 
-  // Create order
+  // Verify token and get user ID from auth service
+  let verifyRes = http.post(`${AUTH_BASE_URL}/user/verify-token`, JSON.stringify({ token }), { headers });
+  let userId = null;
+  if (verifyRes.status === 200) {
+    try {
+      const userData = JSON.parse(verifyRes.body);
+      userId = userData.id;
+      storeUUID('auth', 'userId', userId);
+    } catch (_) {}
+  }
+
+  // Create order with verified user ID
   let orderRes = http.post(`${ORDERS_BASE_URL}/order`, JSON.stringify({
-    user_id: getRandomUUID('auth', 'userId') || randomString(8),
+    user_id: userId || getRandomUUID('auth', 'userId') || randomString(8),
     items: [{
       product_id: getRandomUUID('products', 'productIds') || randomString(8),
       quantity: randomInt(1, 5)
@@ -305,10 +326,10 @@ export function ordersScenario() {
   let orderId = getRandomUUID('orders', 'orderIds') || randomString(8);
 
   let actions = [
-    () => { let r = http.get(`${ORDERS_BASE_URL}/order?user=${orderId}`, { headers }); actionsLog.push(`Get all orders: status ${r.status}`); if (r.status === 500) errors++; errorRates.orders.add(r.status === 500); },
-    () => { let r = http.get(`${ORDERS_BASE_URL}/order/${orderId}?user=${orderId}`, { headers }); actionsLog.push(`Get order detail: status ${r.status}`); if (r.status === 500) errors++; errorRates.orders.add(r.status === 500); },
-    () => { let r = http.post(`${ORDERS_BASE_URL}/order/${orderId}/pay`, JSON.stringify({ payment_method: 'BANK_TRANSFER', payment_reference: `PAY${randomInt(1000,9999)}`, amount: randomInt(1000, 100000) }), { headers }); actionsLog.push(`Pay order: status ${r.status}`); if (r.status === 500) errors++; errorRates.orders.add(r.status === 500); },
-    () => { let r = http.post(`${ORDERS_BASE_URL}/order/${orderId}/cancel`, JSON.stringify({ user: orderId }), { headers }); actionsLog.push(`Cancel order: status ${r.status}`); if (r.status === 500) errors++; errorRates.orders.add(r.status === 500); },
+    () => { let r = http.get(`${ORDERS_BASE_URL}/order?user=${orderId}`, { headers }); actionsLog.push(`Get all orders: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.orders.add(isServerError(r.status)); },
+    () => { let r = http.get(`${ORDERS_BASE_URL}/order/${orderId}?user=${orderId}`, { headers }); actionsLog.push(`Get order detail: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.orders.add(isServerError(r.status)); },
+    () => { let r = http.post(`${ORDERS_BASE_URL}/order/${orderId}/pay`, JSON.stringify({ payment_method: 'BANK_TRANSFER', payment_reference: `PAY${randomInt(1000,9999)}`, amount: randomInt(1000, 100000) }), { headers }); actionsLog.push(`Pay order: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.orders.add(isServerError(r.status)); },
+    () => { let r = http.post(`${ORDERS_BASE_URL}/order/${orderId}/cancel`, JSON.stringify({ user: orderId }), { headers }); actionsLog.push(`Cancel order: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.orders.add(isServerError(r.status)); },
   ];
   let n = randomInt(2, 4);
   for (let i = 0; i < n; i++) {
@@ -355,9 +376,20 @@ export function wishlistScenario() {
   let actionsLog = [];
   let errors = 0;
 
-  // Create wishlist
+  // Verify token and get user ID from auth service
+  let verifyRes = http.post(`${AUTH_BASE_URL}/user/verify-token`, JSON.stringify({ token }), { headers });
+  let userId = null;
+  if (verifyRes.status === 200) {
+    try {
+      const userData = JSON.parse(verifyRes.body);
+      userId = userData.id;
+      storeUUID('auth', 'userId', userId);
+    } catch (_) {}
+  }
+
+  // Create wishlist with verified user ID
   let wishlistRes = http.post(`${WISHLIST_BASE_URL}/wishlist`, JSON.stringify({
-    user_id: getRandomUUID('auth', 'userId') || randomString(8),
+    user_id: userId || getRandomUUID('auth', 'userId') || randomString(8),
     name: `Wishlist ${randomString(5)}`
   }), { headers });
 
@@ -373,12 +405,12 @@ export function wishlistScenario() {
   let productId = getRandomUUID('products', 'productIds') || randomString(8);
 
   let actions = [
-    () => { let r = http.get(`${WISHLIST_BASE_URL}/wishlist?user=${wishlistId}`, { headers }); actionsLog.push(`Get all wishlists: status ${r.status}`); if (r.status === 500) errors++; errorRates.wishlist.add(r.status === 500); },
-    () => { let r = http.get(`${WISHLIST_BASE_URL}/wishlist/${wishlistId}?user=${wishlistId}`, { headers }); actionsLog.push(`Get wishlist by ID: status ${r.status}`); if (r.status === 500) errors++; errorRates.wishlist.add(r.status === 500); },
-    () => { let r = http.put(`${WISHLIST_BASE_URL}/wishlist/${wishlistId}`, JSON.stringify({ name: `Updated Wishlist ${randomString(5)}` }), { headers }); actionsLog.push(`Update wishlist: status ${r.status}`); if (r.status === 500) errors++; errorRates.wishlist.add(r.status === 500); },
-    () => { let r = http.del(`${WISHLIST_BASE_URL}/wishlist/${wishlistId}`, null, { headers }); actionsLog.push(`Delete wishlist: status ${r.status}`); if (r.status === 500) errors++; errorRates.wishlist.add(r.status === 500); },
-    () => { let r = http.post(`${WISHLIST_BASE_URL}/wishlist/product`, JSON.stringify({ user: wishlistId, wishlist_id: wishlistId, product_id: productId }), { headers }); actionsLog.push(`Add product to wishlist: status ${r.status}`); if (r.status === 500) errors++; errorRates.wishlist.add(r.status === 500); },
-    () => { let r = http.del(`${WISHLIST_BASE_URL}/wishlist/product`, JSON.stringify({ user: wishlistId, id: productId }), { headers }); actionsLog.push(`Remove product from wishlist: status ${r.status}`); if (r.status === 500) errors++; errorRates.wishlist.add(r.status === 500); },
+    () => { let r = http.get(`${WISHLIST_BASE_URL}/wishlist?user=${wishlistId}`, { headers }); actionsLog.push(`Get all wishlists: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.wishlist.add(isServerError(r.status)); },
+    () => { let r = http.get(`${WISHLIST_BASE_URL}/wishlist/${wishlistId}?user=${wishlistId}`, { headers }); actionsLog.push(`Get wishlist by ID: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.wishlist.add(isServerError(r.status)); },
+    () => { let r = http.put(`${WISHLIST_BASE_URL}/wishlist/${wishlistId}`, JSON.stringify({ name: `Updated Wishlist ${randomString(5)}` }), { headers }); actionsLog.push(`Update wishlist: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.wishlist.add(isServerError(r.status)); },
+    () => { let r = http.del(`${WISHLIST_BASE_URL}/wishlist/${wishlistId}`, null, { headers }); actionsLog.push(`Delete wishlist: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.wishlist.add(isServerError(r.status)); },
+    () => { let r = http.post(`${WISHLIST_BASE_URL}/wishlist/product`, JSON.stringify({ user: wishlistId, wishlist_id: wishlistId, product_id: productId }), { headers }); actionsLog.push(`Add product to wishlist: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.wishlist.add(isServerError(r.status)); },
+    () => { let r = http.del(`${WISHLIST_BASE_URL}/wishlist/product`, JSON.stringify({ user: wishlistId, id: productId }), { headers }); actionsLog.push(`Remove product from wishlist: status ${r.status}`); if (isServerError(r.status)) errors++; errorRates.wishlist.add(isServerError(r.status)); },
   ];
   let n = randomInt(2, 4);
   for (let i = 0; i < n; i++) {
